@@ -24,14 +24,14 @@
 
 \documentclass[
 12pt, % The default document font size, options: 10pt, 11pt, 12pt
-%oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
 english, % ngerman for German
 onehalfspacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
 %draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
-%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
-%liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
 %toctotoc, % Uncomment to add the main table of contents to the table of contents
-%parskip, % Uncomment to add space between paragraphs
+parskip, % Uncomment to add space between paragraphs
 %nohyperref, % Uncomment to not load the hyperref package
 headsepline, % Uncomment to get a line under the header
 %chapterinoneline, % Uncomment to place the chapter title next to the number on one line
@@ -43,9 +43,9 @@ headsepline, % Uncomment to get a line under the header
 
 \usepackage{mathpazo} % Use the Palatino font by default
 
-\usepackage[backend=bibtex,style=authoryear,natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+\usepackage[backend=bibtex,style=authoryear-comp, natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 
-\addbibresource{main.bib} % The filename of the bibliography
+\addbibresource{./main.bib} % The filename of the bibliography
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 
@@ -55,11 +55,11 @@ headsepline, % Uncomment to get a line under the header
 
 \geometry{
 	paper=a4paper, % Change to letterpaper for US letter
-	inner=2.5cm, % Inner margin
+	inner=2cm, % Inner margin
 	outer=3.8cm, % Outer margin
 	bindingoffset=.5cm, % Binding offset
-	top=1.5cm, % Top margin
-	bottom=1.5cm, % Bottom margin
+	top=2cm, % Top margin
+	bottom=2cm, % Bottom margin
 	%showframe, % Uncomment to show how the type block is set on the page
 }
 
@@ -87,6 +87,8 @@ headsepline, % Uncomment to get a line under the header
 \hypersetup{pdfkeywords=\keywordnames} % Set the PDF's keywords to your keywords
 }
 
+\newcommand{\code}[1]{\texttt{#1}}
+
 \begin{document}
 
 \frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
@@ -111,13 +113,13 @@ headsepline, % Uncomment to get a line under the header
 \begin{minipage}[t]{0.4\textwidth}
 \begin{flushleft} \large
 \emph{Author:}\\
-Anatolii Stehnii{\authorname}
+{\authorname}
 \end{flushleft}
 \end{minipage}
 \begin{minipage}[t]{0.4\textwidth}
 \begin{flushright} \large
 \emph{Supervisor:} \\
-Dr. Rostyslav Hryniv{\supname} % Supervisor name - remove the \href bracket to remove the link  
+{\supname} % Supervisor name - remove the \href bracket to remove the link  
 \end{flushright}
 \end{minipage}\\[3cm]
  
@@ -176,7 +178,6 @@ Dr. Rostyslav Hryniv{\supname} % Supervisor name - remove the \href bracket to r
 %----------------------------------------------------------------------------------------
 %	ABSTRACT PAGE
 %----------------------------------------------------------------------------------------
-
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
 Software development requires vast knowledge about different programming tools which cannot be kept in human memory. Though software developers often formulate their task in human language to query online knowledge bases like StackOverflow to get short snippets of code. In this work, I explore the way of code generation from natural language description and build an IDE plugin for Python which translates descriptions to short snippets of code. My code generator parses human language to a syntactic tree, translates it to Python abstract syntax tree and generates from it actual code. RESULTS WILL BE HERE.
@@ -207,11 +208,14 @@ I would like to thank Vsevolod Dyomkin and Rostyslav Hryniv who supervised my re
 
 \begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
 
-\textbf{AST} & \textbf{A}abstract \textbf{S}yntax \textbf{T}ree\\
-\textbf{LSTM} & \textbf{L}ong \textbf{S}hort \textbf{T}erm \textbf{M}emory\\
-\textbf{RNN} & \textbf{R}eccurent \textbf{N}eural \textbf{N}etwork\\
-\textbf{RvNN} & \textbf{R}ecursive \textbf{N}eural \textbf{N}etwork\\
+\textbf{AST} & \textbf{A}bstract \textbf{S}yntax \textbf{T}ree\\
 \textbf{CCG} & \textbf{C}ombinatory \textbf{C}ategorial \textbf{G}rammar\\
+\textbf{DNN} & \textbf{D}eep \textbf{N}eural \textbf{N}etwork\\
+\textbf{LSTM} & \textbf{L}ong \textbf{S}hort \textbf{T}erm \textbf{M}emory\\
+\textbf{PBG}  & \textbf{P}hrase \textbf{B}ased \textbf{G}rammar \\
+\textbf{RNN}  & \textbf{R}eccurent \textbf{N}eural \textbf{N}etwork\\
+\textbf{RvNN} & \textbf{R}ecursive \textbf{N}eural \textbf{N}etwork\\
+
 
 \end{abbreviations}
 
@@ -225,16 +229,12 @@ $c$ & program code \\
 $p(y|x)$ & probability of $y$ given $x$ \\
 $h_e(t)$ & encoder hidden state vector for time step $t$ \\
 $h_d(t)$ & decoder hidden state vector for time step $t$ \\
-$v_word$ & word embedding vector
-
+$v_{word}$ & word embedding vector \\
 \addlinespace 
-
-`embed` & word embedding operation  \\
-`softmax` & normalized exponential function \\
-
+\code{embed} & word embedding operation  \\
+\code{softmax} & normalized exponential function \\
 \addlinespace 
-
-$\alpha$ & Attention vector & \si{\radian} \\
+$\alpha$ & Attention vector  \\
 
 \end{symbols}
 

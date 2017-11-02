@@ -508,7 +508,7 @@ KOMA-script documentation for details.}]{fancyhdr}
 	\ifbool{nolistspace}{\begingroup\singlespacing}{}
 	\ifbool{listtoc}{\addchap{\symbolsname}}{\addchap*{\symbolsname}}
 	\begin{longtable}{#1}
-	}{%
+	}{
 	\end{longtable}
 	\addtocounter{table}{-1}% Don't count this table as one of the document tables
 	\ifbool{nolistspace}{\endgroup}{}
