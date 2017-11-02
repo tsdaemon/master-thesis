@@ -1,6 +1,6 @@
 % Chapter 1
 
-\chapter{Chapter Title Here} % Main chapter title
+\chapter{Introduction} % Main chapter title
 
 \label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1} 
 
@@ -15,68 +15,45 @@
 
 %----------------------------------------------------------------------------------------
 
-\section{Welcome and Thank You}
-Welcome to this \LaTeX{} Thesis Template, a beautiful and easy to use template for writing a thesis using the \LaTeX{} typesetting system.
+\section{Motivation}
+Software development described as a knowledge-intensive field (\parencite{Robillard1999}). Implementation and maintenance of enterprise software system require broad knowledge of different programming languages and application programming interfaces. While in 2002 to create a website developer had to know HTML/CSS, PHP and MySQL, in 2017 it requires knowledge about frontend ecosystem, backend frameworks, and different NoSQL query languages. Documentation becomes a bottleneck while solving simple tasks, especially for new developers. Though software development involves regular use of search engines and Q&A databases (\parencite{Treude2011}). Code snippets from crowdsourced resources like StackOverflow usually adopted and reused in other projects. Developers often seek to find existing examples of working code to solve regular tasks instead of write and test it from scratch (\parencite{Brandt2010}). And to find corresponding code snippet software developer first formulates its description as a query for search engine (\parencite{Brandt2009}). 
 
-If you are writing a thesis (or will be in the future) and its subject is technical or mathematical (though it doesn't have to be), then creating it in \LaTeX{} is highly recommended as a way to make sure you can just get down to the essential writing without having to worry over formatting or wasting time arguing with your word processor.
-
-\LaTeX{} is easily able to professionally typeset documents that run to hundreds or thousands of pages long. With simple mark-up commands, it automatically sets out the table of contents, margins, page headers and footers and keeps the formatting consistent and beautiful. One of its main strengths is the way it can easily typeset mathematics, even \emph{heavy} mathematics. Even if those equations are the most horribly twisted and most difficult mathematical problems that can only be solved on a super-computer, you can at least count on \LaTeX{} to make them look stunning.
+However, a web search is time-consuming and cause interruptions of the coding process. As an alternative, this description could be translated directly to code. Such translation tool would reduce the burden of remembering the details of a particular language or API and allow a developer to use his time for more creative aspects of development. The proposed translation tool is dynamic, interactive and easy-to-use. It uses a code description to generate a required snippet of code just under the programmer cursor.
 
 %----------------------------------------------------------------------------------------
 
-\section{Learning \LaTeX{}}
+\section{Goals}
 
-\LaTeX{} is not a \textsc{wysiwyg} (What You See is What You Get) program, unlike word processors such as Microsoft Word or Apple's Pages. Instead, a document written for \LaTeX{} is actually a simple, plain text file that contains \emph{no formatting}. You tell \LaTeX{} how you want the formatting in the finished document by writing in simple commands amongst the text, for example, if I want to use \emph{italic text for emphasis}, I write the \verb|\emph{text}| command and put the text I want in italics in between the curly braces. This means that \LaTeX{} is a \enquote{mark-up} language, very much like HTML.
-
-\subsection{A (not so short) Introduction to \LaTeX{}}
-
-If you are new to \LaTeX{}, there is a very good eBook -- freely available online as a PDF file -- called, \enquote{The Not So Short Introduction to \LaTeX{}}. The book's title is typically shortened to just \emph{lshort}. You can download the latest version (as it is occasionally updated) from here:
-\url{http://www.ctan.org/tex-archive/info/lshort/english/lshort.pdf}
-
-It is also available in several other languages. Find yours from the list on this page: \url{http://www.ctan.org/tex-archive/info/lshort/}
-
-It is recommended to take a little time out to learn how to use \LaTeX{} by creating several, small `test' documents, or having a close look at several templates on:\\ 
-\url{http://www.LaTeXTemplates.com}\\ 
-Making the effort now means you're not stuck learning the system when what you \emph{really} need to be doing is writing your thesis.
-
-\subsection{A Short Math Guide for \LaTeX{}}
-
-If you are writing a technical or mathematical thesis, then you may want to read the document by the AMS (American Mathematical Society) called, \enquote{A Short Math Guide for \LaTeX{}}. It can be found online here:
-\url{http://www.ams.org/tex/amslatex.html}
-under the \enquote{Additional Documentation} section towards the bottom of the page.
-
-\subsection{Common \LaTeX{} Math Symbols}
-There are a multitude of mathematical symbols available for \LaTeX{} and it would take a great effort to learn the commands for them all. The most common ones you are likely to use are shown on this page:
-\url{http://www.sunilpatel.co.uk/latex-type/latex-math-symbols/}
-
-You can use this page as a reference or crib sheet, the symbols are rendered as large, high quality images so you can quickly find the \LaTeX{} command for the symbol you need.
-
-\subsection{\LaTeX{} on a Mac}
- 
-The \LaTeX{} distribution is available for many systems including Windows, Linux and Mac OS X. The package for OS X is called MacTeX and it contains all the applications you need -- bundled together and pre-customized -- for a fully working \LaTeX{} environment and work flow.
- 
-MacTeX includes a custom dedicated \LaTeX{} editor called TeXShop for writing your `\file{.tex}' files and BibDesk: a program to manage your references and create your bibliography section just as easily as managing songs and creating playlists in iTunes.
+\begin{enumerate}
+	\item Explore previous examples of code generation or code search.
+	\item Train Description2Code syntactic model and compare its performance with previous results.
+	\item Develop production ready code generation plugin for PyCharm IDE.
+\end{enumerate}
 
 %----------------------------------------------------------------------------------------
 
-\section{Getting Started with this Template}
+\section{Related works}
 
-If you are familiar with \LaTeX{}, then you should explore the directory structure of the template and then proceed to place your own information into the \emph{THESIS INFORMATION} block of the \file{main.tex} file. You can then modify the rest of this file to your unique specifications based on your degree/university. Section \ref{FillingFile} on page \pageref{FillingFile} will help you do this. Make sure you also read section \ref{ThesisConventions} about thesis conventions to get the most out of this template.
+\subsection{Automatic programming}
 
-If you are new to \LaTeX{} it is recommended that you carry on reading through the rest of the information in this document.
+A problem of translation of high-order specifications to low-order instructions was recognized at the early years of computational industry. It addresses the main goal of computer science and artificial general intelligence - to shift the burden of requirements understanding and instructions implementation from human to machine. The notion of automatic programming was first established in FORTRAN compiler in 1957 (\parencite{backus1957fortran}) and used as a prototype of high-order programming concept.  Later automatic programming splits into two complementary approaches: bottom-up and top-down (\parencite{Balzer1985}). In the first approach, a specification language is developed as a set of high order functions and modules. And in the second approach, informal specification language is adopted to the formal level, which can be compiled automatically. While the first approach was a background for high-order programming languages and frameworks, the second approach gave a raise for automatic code generation field. 
 
-Before you begin using this template you should ensure that its style complies with the thesis style guidelines imposed by your institution. In most cases this template style and layout will be suitable. If it is not, it may only require a small change to bring the template in line with your institution's recommendations. These modifications will need to be done on the \file{MastersDoctoralThesis.cls} file.
+First attempts to build automatic programming system addressed the roles of symbolic evaluations, deduction and programming knowledge in the programming process. That was coherent with symbolic artificial intelligence, a dominant paradigm in artificial intelligence research from the mid-1950s until the late 1980s (\parentcite{haugeland1989artificial}). Works of \parencite{green1969application} and \parencite{Lee1974} was focused on the use of theorem-prover to produce the programs. In 1976, the PSI program synthesis system (\parencite{green1976design}, \parencite{green1977summary}) was concerned with coding a high-level program knowledge from requirements collected via dialog with a user. It used a set of expert modules to build program model from natural language and generate a code for this model. For example, one of the generator modules was PECOS (\parencite{barstow1979experiment}), which used a set of symbolic rules to design abstract algorithms like sorting or graph reaching. 
 
-\subsection{About this Template}
+Another automated coding attempt was made in 1978 with project SAFE (\parencite{balzer1978informality}). It is used semantic parsing to resolve ambiguity in informal specifications and translate them into a symbolic representation. While SAFE was a laboratory prototype designed to solve a limited set of tasks, its results were used in further automated programing researches like specification language Gist (\parencite{Balzer1985}) in 1985 and automatic requirement derivation system SPECIFIER in 1991 (\parencite{Miriyala1991}).
 
-This \LaTeX{} Thesis Template is originally based and created around a \LaTeX{} style file created by Steve R.\ Gunn from the University of Southampton (UK), department of Electronics and Computer Science. You can find his original thesis style file at his site, here:
-\url{http://www.ecs.soton.ac.uk/~srg/softwaretools/document/templates/}
+Although these works have given a great advance in ideas about knowledge representation and informality translation, they have major flaws. Symbolic approach to artificial intelligence was criticised (\parencite{mcdermott1987critique}, \parencite{harnad1990symbol}) for symbolic grounding problem and problems with uncertainty representation. \parencite{dreyfus1994computers} argued that symbols and formal rules could not catch unconscious instincts which form human intelligence. 
 
-Steve's \file{ecsthesis.cls} was then taken by Sunil Patel who modified it by creating a skeleton framework and folder structure to place the thesis files in. The resulting template can be found on Sunil's site here:
-\url{http://www.sunilpatel.co.uk/thesis-template}
+\subsection{Snippet generation}
 
-Sunil's template was made available through \url{http://www.LaTeXTemplates.com} where it was modified many times based on user requests and questions. Version 2.0 and onwards of this template represents a major modification to Sunil's template and is, in fact, hardly recognisable. The work to make version 2.0 possible was carried out by \href{mailto:vel@latextemplates.com}{Vel} and Johannes Böttcher.
+With the development of complex high order languages and frameworks appeared another application of code generation. Instead of end-to-end translation of complex high-order requirements to software system into compiled instructions, code generation used as a handy snippet generation tool. For example, \parencite{little2009keyword} proposed a keyword based generation of Java code and implemented it in integrated development environment plugin for Eclipse. \parencite{Gvero2015} addresses the problem of description to code generation as a machine translation task and use probabilistic context-free grammar model to generate a list of ranked expressions for a developer. Codehint (\parencite{Galenson2014}), another plugin for Eclipse, explores Java virtual machine execution state to build search space of possible expressions for given description and then select the most likely one using the statistical model built offline from existing projects. NaturalJava (\parencite{Price2000}) accepts English sentences as input and uses decision trees to infer Java abstract syntax tree.
 
+Another common approach in code generation is a creation of code for predefined context, in other words, input and output of a module. These solutions allow to fill gaps and create connections in the program template. \parencite{Raychev2014} used statistical language models to synthesize the code for holes in application programming interfaces with a most likely sequence of statements. \parencite{Jha2010} proposes code generation approach with I/O oracle, constrained to with input-output behavior and a set of available components. Search in the expression space performed with off-the-shelf Satisfiability Modulo Theory solvers. Domain-specific solution StreamBit (\parencite{Solar-Lezama2005}) shifts the task of most complex and error sensitive bit-level operations from programmer to a code generator. A developer only needs to write a sketch - a domain-specific description which then translated to C implementation. \parencite{Srivastava2010} used verification tools to perform proof-theoretic program synthesis with given an input-output functional specification and a specification of the synthesized program’s looping structure.
+
+\subsection{Deep learning} 
+Artificial neural networks are able to approximate statistical distribution prior to some conditions (\prencite{white1992artificial}). This distribution could be used to draw samples of complex models or processes like sequence of symbols in programming code (\parencite{goodfellow2016deep}). With invention of word embeddings (\parencite{bengio2003neural}) sequences of informal instructions became a possible input for neural models. Great advance in language modelling was introduced by recurrent neural models (\parencite{sundermeyer2012lstm}, \parencite{hochreiter1997long}, \parencite{Jozefowicz2016}, \parentcite{Gers2001}), which able to capture features encoded in sequential structure of natural language. Sequence to sequence models (\parencite{NIPS2014_5346}) with recent novel techniques like attention mechanism (\parencite{Luong2015}, \parencite{Jean2014}, \parencite{Bahdanau2014}) allowed to surpass results of phrase-based machine translation in real scale system like Google Translation (\parencite{Wu2016}). 
+
+Code generation with neural models was interpreted as a neural machine translation problem and used established approach: Sequence2Sequence with attention. \parencite{Zhong2017} uses pointer based generation and reinforcement learning for generation of SQL queries from informal questions. \parencite{Ling2016} proposed an architecture of latent predictor networks with structured attention for generation of Magic: The Gathering and HearthStone cards implementation from card description in Java and Python. In \parencite{Chen2016} used latent attention to generate If-Then recipes for natural descriptions for IFTTT.com dataset.
 %----------------------------------------------------------------------------------------
 
 \section{What this Template Includes}
