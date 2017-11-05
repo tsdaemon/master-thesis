@@ -102,13 +102,13 @@ headsepline, % Uncomment to get a line under the header
 \begin{titlepage}
 \begin{center}
 
-\vspace*{.06\textheight}
-{\scshape\LARGE \univname\par}\vspace{1.5cm} % University name
+\vspace{1.5cm}
+{\scshape\LARGE \univname\par}\vspace{1.2cm} % University name
 \textsc{\Large Master Thesis}\\[0.5cm] % Thesis type
 
-\HRule \\[0.4cm] % Horizontal line
-{\huge \bfseries \ttitle\par}\vspace{0.4cm} % Thesis title
-\HRule \\[1.5cm] % Horizontal line
+\HRule \\[0.2cm] % Horizontal line
+{\huge \bfseries \ttitle\par}\vspace{0.2cm} % Thesis title
+\HRule \\[0.8cm] % Horizontal line
  
 \begin{minipage}[t]{0.4\textwidth}
 \begin{flushleft} \large
@@ -119,21 +119,19 @@ headsepline, % Uncomment to get a line under the header
 \begin{minipage}[t]{0.4\textwidth}
 \begin{flushright} \large
 \emph{Supervisor:} \\
-{\supname} % Supervisor name - remove the \href bracket to remove the link  
+{\supname}  
 \end{flushright}
-\end{minipage}\\[3cm]
+\end{minipage}\\[1cm]
  
-\vfill
+%\vfill
 
 \large \textit{A thesis submitted in fulfillment of the requirements\\ for the degree of \degreename}\\[0.3cm] % University requirement text
 \textit{in the}\\[0.4cm]
-\groupname\\\deptname\\[2cm] % Research group name and department name
+\groupname\\\deptname\\[1cm] % Research group name and department name
  
-\vfill
-\includegraphics[height=5cm]{UCU-Apps.png} % University/department logo - uncomment to place it
+\includegraphics[height=4cm]{UCU-Apps.png} % University/department logo - uncomment to place it
 
-\vfill
-{\large Lviv 2017}\\[4cm] % Date
+{\large Lviv 2017}\\[2cm] % Date
  
 \vfill
 \end{center}
@@ -189,7 +187,9 @@ Software development requires vast knowledge about different programming tools w
 
 \begin{acknowledgements}
 \addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-I would like to thank Vsevolod Dyomkin and Rostyslav Hryniv who supervised my research and directed me during thesis writing. Also, I am grateful to Ukrainian Catholic University and Oleksii  Molchanovskyi personally who created the first computer science master program in Ukraine. And many thanks to my family for support and patience. 
+I would like to thank Vsevolod Dyomkin and Rostyslav Hryniv who supervised my research and directed me during thesis writing. Also, I am grateful to Ukrainian Catholic University and Oleksii  Molchanovskyi personally who created the first computer science master program in Ukraine. 
+
+Arvilab
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
@@ -252,34 +252,16 @@ $\alpha$ & Attention vector  \\
 
 \pagestyle{thesis} % Return the page headers back to the "thesis" style
 
-% Include the chapters of the thesis as separate files from the Chapters folder
-% Uncomment the lines as you write the chapters
-
 \include{Chapters/Chapter1}
-%\include{Chapters/Chapter2} 
+\include{Chapters/Chapter2} 
 %\include{Chapters/Chapter3}
 %\include{Chapters/Chapter4} 
 %\include{Chapters/Chapter5} 
 
-%----------------------------------------------------------------------------------------
-%	THESIS CONTENT - APPENDICES
-%----------------------------------------------------------------------------------------
-
-\appendix % Cue to tell LaTeX that the following "chapters" are Appendices
-
-% Include the appendices of the thesis as separate files from the Appendices folder
-% Uncomment the lines as you write the Appendices
+\appendix 
 
 %\include{Appendices/AppendixA}
 %\include{Appendices/AppendixB}
 %\include{Appendices/AppendixC}
-
-%----------------------------------------------------------------------------------------
-%	BIBLIOGRAPHY
-%----------------------------------------------------------------------------------------
-
 \printbibliography[heading=bibintoc]
-
-%----------------------------------------------------------------------------------------
-
 \end{document}  

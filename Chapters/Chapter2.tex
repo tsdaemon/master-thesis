@@ -6,44 +6,17 @@
 
 \section{Code generation problem}
 
-Given a natural language description $x$ our task is to infer the Python code based on the intent of the $x$. This task is solved by a generation of an underlying abstract syntax tree $y$. A probabilistic grammar model of generating an abstract syntax tree $y$ given $x$ is defined as $p(y|x)$. The best corresponding syntax tree $y^$ is defined as
+Given a natural language description $x$ our task is to infer the Python code based on the intent of the $x$. This task is solved by a generation of an underlying abstract syntax tree $y$. A probabilistic grammar model of generating an abstract syntax tree $y$ given $x$ is defined as $p(y|x)$. The best corresponding syntax tree $y$ is defined as
 
 \begin{equation}
-y^=argmax_{y} p(y|x).
+y=\underset{y}{\operatorname{argmax}}\, p(y|x)
 \label{eqn:main_problem}
 \end{equation}
 
 $y$ is then deterministically converted to Python code $c$. 
 
 \section{Abstract syntax tree}
-
 The \emph{abstract syntax tree} is a tree representation of an abstract structure of programming code. For each expression or statement in the code, abstract syntax tree assigns the corresponding node. Abstract syntax tree could not contain all the details of the underlying code like parentheses or  indentation, but its structure allows unambiguously interpret a code execution process. The established grammar of abstract syntax tree reduces search space of the model and implies the validity of programming code syntax. 
-
-\begin{table}
-\caption{Example abstract syntax tree for Python code snippet.}
-\label{tab:ast_example}
-\centering
-\begin{tabular}{l l}
-\toprule
-\tabhead{Code snippet} & \tabhead{Abstract syntax tree dump} \\
-\midrule
-\code{ls = sorted(a, key=lambda x: x[1])} & \code{Module(\newline
-\tab body=[\newline
-\tab \tab Assign(targets=[Name(id='ls')],\newline
-\tab \tab \tab value=Call(func=Name(id='sorted'),\newline
-\tab \tab \tab args=[Name(id='a')],\newline
-\tab \tab \tab keywords=[\newline
-\tab \tab \tab \tab  keyword(arg='key',\newline
-\tab \tab \tab \tab \tab value=Lambda(args=arguments(args=[arg(arg='x', annotation=None)],\newline
-\tab \tab \tab \tab \tab \tab vararg=None,\newline
-\tab \tab \tab \tab \tab \tab kwonlyargs=[],\newline
-\tab \tab \tab \tab \tab \tab kw_defaults=[],\newline
-\tab \tab \tab \tab \tab \tab kwarg=None,\newline
-\tab \tab \tab \tab \tab \tab defaults=[]),\newline
-\tab \tab \tab \tab \tab body=Subscript(value=Name(id='x'), slice=Index(value=Num(n=1)))))]))])}
-\bottomrule\\
-\end{tabular}
-\end{table}
 
 Example of abstract syntax tree could be seen on \ref{fig:ast}. This is a graphic representation of code snippet from \ref{tab:ast_example}. Full Python abstract grammar could be found in Appendix A.
 
@@ -66,21 +39,23 @@ $V_T$ is terminal vocabulary and it contains a set of words.
 $P$ identifies the collection of the production rules of the grammar.
 To illustrate this concept, I present a short grammar to parse a sentence "`good dogs like cats"' to its syntactic representation. The grammar for this example contains following vocabulary:
 \begin{equation}
-V_N = {S, NP, VP, A, N, V}
+\begin{split}
+V_N = {S, NP, VP, A, N, V}\\
 V_T = {cats, dogs, like, nice}
+\end{split}
 \end{equation}
 The production rules for this grammar would be following:
 \begin{verbatim}
-S → NP VP
-NP → A N
-NP → N
-VP → V NP
-N → dogs
-N → cats
-V → like
-A → good
+S => NP VP
+NP => A N
+NP => N
+VP => V NP
+N => dogs
+N => cats
+V => like
+A => good
 \end{verbatim}
-Graphic representation of syntactic tree  of this sentence could be seen in \ref{syntax_tree}.
+Graphic representation of syntactic tree  of this sentence could be seen in \ref{fig:syntax_tree}.
 
 \begin{figure}
 \centering
@@ -100,68 +75,55 @@ Let's consider an example. Adjective ‘good’ is in a category corresponding t
 good = NP/N 
 \end{verbatim}
 
-\[ 
-\lambda x.good(x) 
-\]\footnote{To make connection of CCG categories with lambda calculus clear, I will complement each example of categorial operations with lines of lambda calculus.}
+$\lambda x.good(x)$\footnote{To make connection of CCG categories with lambda calculus clear, I will complement each example of categorial operations with lines of lambda calculus.}
 
 \code{NP} on the left side of the slash character denotes function return value and \code{N} on the right side denotes function argument. This function could be resolved with forward function application operation, denoted by character \code{>}:
 
 \begin{verbatim}
-dogs = N
-good dogs = NP/N>N = NP
+dogs => N
+good dogs => NP/N>N = NP
 \end{verbatim}
 
-\[ 
-DOGS \\
-\lambda x.good(x)(DOGS)=good(DOGS) 
-\]
+$\lambda x.good(x)(DOGS)=good(DOGS)$
 
-With backward slash character \code{\\} right side category denotes function return and left side denotes function argument. Example:
+With backward slash character \code{\textbackslash} right side category denotes function return and left side denotes function argument. Example:
 
 \begin{verbatim}
-bird = N
-flies = N\\S
-bird flies = N>N\\S = S
+bird => N
+flies => N\textbackslash S
+bird flies => N>N\textbackslash S = S
 \end{verbatim}
 
-\[ 
-BIRD \\
-\lambda x.flies(x)\\
-\lambda x.flies(x)(BIRD)=flies(BIRD)
-\]
+$\lambda x.flies(x)$
+
+$\lambda x.flies(x)(BIRD)=flies(BIRD) $
 
 A verb such as ‘like’ is usually taking two arguments and associated as follows:
 
 \begin{verbatim}
-like = (S/NP)\\N
-cats = N
-like cats = (S/NP)\\N>N = S/NP
+like => (S/NP)\textbackslash N
+cats => N
+like cats => (S/NP)\textbackslash N>N = S/NP
 \end{verbatim}
 
-\[ 
-\lambda x.\lambda y.like(x, y)
-CATS
-\lambda x.\lambda y.like(y, x)(CATS)=\lambda y.like(y, CATS)
-\]
+$\lambda x.\lambda y.like(x, y)$
+
+$\lambda x.\lambda y.like(y, x)(CATS)=\lambda y.like(y, CATS)$
 
 The function \code{(S/NP)\\N} maps \code{N} to a range of functions of form \code{S/NP}.  Character \code{<} denotes backward function application. Final sentence example:
 
 \begin{verbatim}
-good dogs = NP
-like cats = S/NP
-good dogs like cats = NP<S/NP = S
+good dogs => NP
+like cats => S/NP
+good dogs like cats => NP<S/NP = S
 \end{verbatim}
 
-\[ 
-good(DOGS) 
-\lambda y.like(y, CATS)
-\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)
-\]
+$\lambda y.like(y, CATS)$
+
+$\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
 
 \section{Word embeddings}
 The task of language modeling requires the transformation of words and documents into some vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches could require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
-
-Methods of \emphy{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing in the same point as vector ‘aunt’ (see \ref{fig:word_embeddings} for example).
 
 \begin{figure}
 \centering
@@ -170,6 +132,8 @@ Methods of \emphy{word embeddings} solve both problems, providing dense vectors 
 \caption[Word vectors]{Example of collinearity between two word vectors.}
 \label{fig:word_embeddings}
 \end{figure}
+
+Methods of \emph{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing in the same point as vector ‘aunt’ (see \ref{fig:word_embeddings} for example).
 
 \section{Long-short term memory network}
 Model of LSTM network is an extension of the simple recurrent network. It can store values in the hidden layer for a short or long period of time because it uses no activation function within its recurrent components. This makes able to backpropagate error gradient through long sequences of data without gradient vanishing or gradient exploding.
@@ -197,24 +161,21 @@ i_t=\sigma(W_i\cdot[h_{t-1}, x_t]+b_i)
 \end{equation} 
 
 \begin{equation}
-\widetilde{C}_t = tanh(W_c\cdot[h_{t-1}, x_t]+b_C)
-
+\begin{split}
+\widetilde{C}_t = tanh(W_c\cdot[h_{t-1}, x_t]+b_C) \\
 C_t = f_t\circC_{t-1}+i_t\circ\widetilde{C}_t
 \label{lstm:c}
+\begin{split}
 \end{equation} 
-
 Gate for new hidden state:
-
 \begin{equation}
 o_t=\sigma(W_o[h_{t-1},x_t]+b_o)
 \label{lstm:o}
 \end{equation} 
-
 \begin{equation}
 h_t=o_t\circ tanh(C_t)
 \label{lstm:o}
 \end{equation} 
-
 \section{Sequence to sequence machine translation with attention}
 The task of machine translation can be formalized as mapping of a sequence of words in a source language to a sequence of words in a target language. This task can be solved with an \emph{encoder-decoder} model, which consists of two recurrent neural networks. The first RNN consumes input sequence step by step and encodes it into so-called thought vector. After encoding, the second RNN uses thought vector as its initial hidden state and decodes output sentence word by word.  Each word from decoder output is used as input for the next decoding step until the model outputs the end-of-sentence token. 
 
@@ -225,29 +186,7 @@ This problem can be solved with attention technique. Its basic idea is to replac
 \begin{equation}
 h_d(t) = enc([embed(w(t));c(t-1)], h_d(t-1))
 \label{attn:hd}
-\end{equation} 
-
-Elements of attention vector calculated with arbitrary attention score function (for example, vector product) for each pair of decoder and encoder representations:
-
-\begin{equation}
-\alpha_j(t) = attn_score(h_e(j), h_d(t))
-\alpha_j(t) = softmax(\alpha_j(t))
-\label{attn:alpha}
 \end{equation}
-
-Then context vector calculated as a weighted sum of encoder representations:
-
-\begin{equation}
-c(t) = H_e\cdot\alpha(t)
-\label{attn:c}
-\end{equation}
-
-\begin{equation}
-P(t) = softmax(W_{hs}\cdot[h_d(t);c(t)])
-\label{attn:P}
-\end{equation}
-
-This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length though vector and though it can model natural language with adequate model size. An architecture of sequence to sequence model with attention can be seen at the \ref{fig:seq2seq}.
 
 \begin{figure}
 \centering
@@ -257,8 +196,26 @@ This way each decoder step can use information from arbitrary part of encoded se
 \label{fig:seq2seq}
 \end{figure}
 
-\section{Recursive neural networks}
+Elements of attention vector calculated with arbitrary attention score function (for example, vector product) for each pair of decoder and encoder representations:
+\begin{equation}
+	\begin{split}
+		\alpha_j(t) = attn_score(h_e(j), h_d(t))\\
+		\alpha_j(t) = softmax(\alpha_j(t))
+	\begin{split}
+\label{attn:alpha}
+\end{equation}
+Then context vector calculated as a weighted sum of encoder representations:
+\begin{equation}
+	c(t) = H_e\cdot\alpha(t)
+	\label{attn:c}
+\end{equation}
+\begin{equation}
+	P(t) = softmax(W_{hs}\cdot[h_d(t);c(t)])
+\label{attn:P}
+\end{equation}
+This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length though vector and though it can model natural language with adequate model size. An architecture of sequence to sequence model with attention can be seen at the \ref{fig:seq2seq}.
 
+\section{Recursive neural networks}
 The architecture of recurrent neural network reflects domain knowledge about conditional probability of target variable with previous values in a sequence. Representation of natural language can also be modeled as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language meaning representation.
 
 \begin{figure}
@@ -272,12 +229,12 @@ The architecture of recurrent neural network reflects domain knowledge about con
 Topological structures with variable length could be modeled by neural networks recursively applying the same set of weight to each node. To model syntactic tree, each word is represented by corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of sentence good dog like cats could be modeled the following way:
 
 \begin{equation}
-v_NP = f(W\cdot[v_good, v_dog])
-v_VP = f(W\cdot[v_like, v_cats])
-v_S = f(W\cdot[v_NP, v_VP])
+\begin{split}
+v_{NP} = f(W\cdot[v_{good}, v_{dog}])\\
+v_{VP} = f(W\cdot[v_{like}, v_{cats}])\\
+v_S = f(W\cdot[v_{NP}, v_{VP}])
 \label{attn:rvnn_example}
+\end{split}
 \end{equation}
 
 where $f$ is any differentiable nonlinearity like $tanh$ or $relu$. The example of semantic tree parsing with recursive network presented on \ref{fig:rvnn}. 
-
- 

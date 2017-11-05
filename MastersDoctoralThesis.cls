@@ -31,6 +31,7 @@
 \providecommand{\baseclass}{book}
 \RequirePackage{etoolbox}
 \RequirePackage{xparse}
+\RequirePackage{amsmath}
 \newbool{nolistspace}
 \newbool{chapteroneline}
 \newbool{listtoc}
