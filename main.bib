@@ -625,4 +625,56 @@
   publisher = {Institute of Electrical and Electronics Engineers ({IEEE})},
 }
 
+@Article{Dong2016,
+  author      = {Li Dong and Mirella Lapata},
+  title       = {Language to Logical Form with Neural Attention},
+  abstract    = {Semantic parsing aims at mapping natural language to machine interpretable meaning representations. Traditional approaches rely on high-quality lexicons, manually-built templates, and linguistic features which are either domain- or representation-specific. In this paper we present a general method based on an attention-enhanced encoder-decoder model. We encode input utterances into vector representations, and generate their logical forms by conditioning the output sequences or trees on the encoding vectors. Experimental results on four datasets show that our approach performs competitively without using hand-engineered features and is easy to adapt across domains and meaning representations.},
+  date        = {2016-01-06},
+  eprint      = {1601.01280v2},
+  eprintclass = {cs.CL},
+  eprinttype  = {arXiv},
+  file        = {online:http\://arxiv.org/pdf/1601.01280v2:PDF},
+  keywords    = {cs.CL},
+}
+
+@InProceedings{pmlr-v37-allamanis15,
+  author    = {Miltos Allamanis and Daniel Tarlow and Andrew Gordon and Yi Wei},
+  title     = {Bimodal Modelling of Source Code and Natural Language},
+  booktitle = {Proceedings of the 32nd International Conference on Machine Learning},
+  year      = {2015},
+  editor    = {Francis Bach and David Blei},
+  volume    = {37},
+  series    = {Proceedings of Machine Learning Research},
+  pages     = {2123--2132},
+  address   = {Lille, France},
+  month     = {07--09 Jul},
+  publisher = {PMLR},
+  abstract  = {We consider the problem of building probabilistic models that jointly model short natural language utterances and source code snippets. The aim is to bring together recent work on statistical modelling of source code and work on bimodal models of images and natural language. The resulting models are useful for a variety of tasks that involve natural language and source code. We demonstrate their performance on two retrieval tasks: retrieving source code snippets given a natural language query, and retrieving natural language descriptions given a source code query (i.e., source code captioning). The experiments show there to be promise in this direction, and that modelling the structure of source code is helpful towards the retrieval tasks.},
+  file      = {allamanis15.pdf:http\://proceedings.mlr.press/v37/allamanis15.pdf:PDF},
+  url       = {http://proceedings.mlr.press/v37/allamanis15.html},
+}
+
+@Article{Bhoopchand2016,
+  author      = {Avishkar Bhoopchand and Tim Rocktäschel and Earl Barr and Sebastian Riedel},
+  title       = {Learning Python Code Suggestion with a Sparse Pointer Network},
+  abstract    = {To enhance developer productivity, all modern integrated development environments (IDEs) include code suggestion functionality that proposes likely next tokens at the cursor. While current IDEs work well for statically-typed languages, their reliance on type annotations means that they do not provide the same level of support for dynamic programming languages as for statically-typed languages. Moreover, suggestion engines in modern IDEs do not propose expressions or multi-statement idiomatic code. Recent work has shown that language models can improve code suggestion systems by learning from software repositories. This paper introduces a neural language model with a sparse pointer network aimed at capturing very long-range dependencies. We release a large-scale code suggestion corpus of 41M lines of Python code crawled from GitHub. On this corpus, we found standard neural language models to perform well at suggesting local phenomena, but struggle to refer to identifiers that are introduced many tokens in the past. By augmenting a neural language model with a pointer network specialized in referring to predefined classes of identifiers, we obtain a much lower perplexity and a 5 percentage points increase in accuracy for code suggestion compared to an LSTM baseline. In fact, this increase in code suggestion accuracy is due to a 13 times more accurate prediction of identifiers. Furthermore, a qualitative analysis shows this model indeed captures interesting long-range dependencies, like referring to a class member defined over 60 tokens in the past.},
+  date        = {2016-11-24},
+  eprint      = {1611.08307v1},
+  eprintclass = {cs.NE},
+  eprinttype  = {arXiv},
+  file        = {online:http\://arxiv.org/pdf/1611.08307v1:PDF},
+  keywords    = {cs.NE, cs.AI, cs.CL, cs.SE},
+}
+
+@InCollection{NIPS2015_5866,
+  author    = {Vinyals, Oriol and Fortunato, Meire and Jaitly, Navdeep},
+  title     = {Pointer Networks},
+  booktitle = {Advances in Neural Information Processing Systems 28},
+  publisher = {Curran Associates, Inc.},
+  year      = {2015},
+  editor    = {C. Cortes and N. D. Lawrence and D. D. Lee and M. Sugiyama and R. Garnett},
+  pages     = {2692--2700},
+  url       = {http://papers.nips.cc/paper/5866-pointer-networks.pdf},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}

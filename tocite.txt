@@ -1,0 +1,6 @@
+@inproceedings{yoshikawa:2017acl,
+  author={Yoshikawa, Masashi and Noji, Hiroshi and Matsumoto, Yuji},
+  title={A* CCG Parsing with a Supertag and Dependency Factored Model},
+  booktitle={Proc. ACL},
+  year=2017,
+}

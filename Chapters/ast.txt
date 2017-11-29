@@ -1,0 +1,32 @@
+\begin{table}
+\caption{Example abstract syntax tree for Python code snippet.}
+\label{tab:ast_example}
+\centering
+\begin{tabular}{l l}
+\toprule
+\tabhead{Code snippet} & \tabhead{Abstract syntax tree dump} \\
+\midrule
+\code{ls = sorted(a, key=lambda x: x[1])} & \code{Module(\newline
+\tab body=[\newline
+\tab \tab Assign(targets=[Name(id='ls')],\newline
+\tab \tab \tab value=Call(func=Name(id='sorted'),\newline
+\tab \tab \tab args=[Name(id='a')],\newline
+\tab \tab \tab keywords=[\newline
+\tab \tab \tab \tab  keyword(arg='key',\newline
+\tab \tab \tab \tab \tab value=Lambda(args=arguments(args=[arg(arg='x', annotation=None)],\newline
+\tab \tab \tab \tab \tab \tab vararg=None,\newline
+\tab \tab \tab \tab \tab \tab kwonlyargs=[],\newline
+\tab \tab \tab \tab \tab \tab kw_defaults=[],\newline
+\tab \tab \tab \tab \tab \tab kwarg=None,\newline
+\tab \tab \tab \tab \tab \tab defaults=[]),\newline
+\tab \tab \tab \tab \tab body=Subscript(value=Name(id='x'), slice=Index(value=Num(n=1)))))]))])}
+\bottomrule\\
+\end{tabular}
+\end{table}
+
+Let $I$ be the set of internal non-terminal nodes and $K$ be the set of terminal tokens that appears across all snippets in a dataset. A tree is denoted as $\Tau$.
+\begin{equation}
+\Tau = (N, ch, val)
+\label{tree:tau}
+\end{equation}
+In \ref{tree:tau} $\Tau$ is defined as a triple made up of nodes $N={1,...,n}$, a children function $ch: N \leftarrow (N^*)$, that maps parent nodes into tuple of children nodes, and a value function $val: N \leftarrow I \cup K$, that maps nodes to internal node types or a token. If $ch(n) = 0$, then $n$ is a terminal node. Nodes are indexed accroding to when they would be instantiated during a depth first traversal of a tree. Also, $\Tau_{<n}$ is defined as a sub-tree of a $\Tau$, which contains all nodes with indexes less than $n$.

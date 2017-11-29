@@ -1,240 +1,43 @@
-% Chapter Template
+\chapter{Related works}
+\label{Chapter2}
 
-\chapter{Background information and theory} % Main chapter title
+\section{Automatic programming}
+A problem of translation of high-order specifications to low-order instructions was recognized at the early years of computational industry. It addresses the main goal of computer science and artificial general intelligence - to shift the burden of requirements understanding and instructions implementation from human to machine. The notion of \emph{automatic} programming was first established in FORTRAN compiler in 1957 \parencite{backus1957fortran} and used as a prototype of high-order programming concept.  Later automatic programming splits into two complementary approaches: bottom-up and top-down \parencite{Balzer1985}. In the first approach, a specification language is developed as a set of high order functions and modules. And in the second approach, informal specification language is adopted to the formal level, which can be compiled automatically. While the first approach was a background for high-order programming languages and frameworks, the second approach gave a raise for automatic code generation field. 
 
-\label{Chapter2} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
+First attempts to build automatic programming system addressed the roles of symbolic evaluations, deduction and programming knowledge in the programming process. That was coherent with symbolic artificial intelligence, a dominant paradigm in artificial intelligence research from the mid-1950s until the late 1980s \parencite{haugeland1989artificial}. Works of \cite{green1969application} and \cite{Lee1974} was focused on the use of theorem-prover to produce the programs. In 1976, the PSI program synthesis system \parencite{green1976design, green1977summary} was concerned with coding a high-level program knowledge from requirements collected via dialog with a user. It used a set of expert modules to build program model from natural language and generate a code for this model. For example, one of the generator modules was PECOS \parencite{barstow1979experiment}, which used a set of symbolic rules to design abstract algorithms like sorting or graph reaching. 
 
-\section{Code generation problem}
+Another automated coding attempt was made in 1978 with project SAFE \parencite{balzer1978informality}. It is used semantic parsing to resolve ambiguity in informal specifications and translate them into a symbolic representation. While SAFE was a laboratory prototype designed to solve a limited set of tasks, its results were used in further automated programing researches like specification language Gist \parencite{Balzer1985} in 1985 and automatic requirement derivation system SPECIFIER in 1991 \parencite{Miriyala1991}.
 
-Given a natural language description $x$ our task is to infer the Python code based on the intent of the $x$. This task is solved by a generation of an underlying abstract syntax tree $y$. A probabilistic grammar model of generating an abstract syntax tree $y$ given $x$ is defined as $p(y|x)$. The best corresponding syntax tree $y$ is defined as
+Although these works have given a great advance in ideas about knowledge representation and informality translation, they have major flaws. Symbolic approach to artificial intelligence was criticized \parencite{mcdermott1987critique, harnad1990symbol} for symbolic grounding problem and problems with uncertainty representation. \cite{dreyfus1994computers} argued that symbols and formal rules could not catch unconscious instincts which form human intelligence. Therefore latter research of automatic programming addressed this problem with statistical machine learning methods like neural networks and representation learning.
 
-\begin{equation}
-y=\underset{y}{\operatorname{argmax}}\, p(y|x)
-\label{eqn:main_problem}
-\end{equation}
+\section{Deep learning} 
+\emph{Deep neural networks} have two major advances for the natural language modeling and translation. The first is \emph{representation learning} \parencite{Bengio2013}, which allows to transform data into the representation which contains important features for current task. This feature allows to create knowledge representations of informal instructions automatically, without complex preparations. And the second is ability to approximate statistical distribution prior to some conditions \parencite{white1992artificial}, which allow to deal with uncertainty in language interpretation. 
 
-$y$ is then deterministically converted to Python code $c$. 
+With invention of word embeddings \parencite{bengio2003neural} sequences of informal instructions became a possible input for neural models. Great advance in language modeling was introduced by \emph{recurrent neural networks} \parencite{sundermeyer2012lstm, hochreiter1997long, Jozefowicz2016, Gers2001} which able to capture features encoded in sequential structure of natural language. \emph{Sequence to sequence models} \parencite{NIPS2014_5346} with recent novel techniques like \emph{attention technique} \parencite{Luong2015, Jean2014, Bahdanau2014}, which allowed to surpass results of phrase-based machine translation in real scale system like Google Translation \parencite{Wu2016}. 
 
-\section{Abstract syntax tree}
-The \emph{abstract syntax tree} is a tree representation of an abstract structure of programming code. For each expression or statement in the code, abstract syntax tree assigns the corresponding node. Abstract syntax tree could not contain all the details of the underlying code like parentheses or  indentation, but its structure allows unambiguously interpret a code execution process. The established grammar of abstract syntax tree reduces search space of the model and implies the validity of programming code syntax. 
+Code generation with neural models was interpreted as a neural machine translation problem and used established approach - Sequence2Sequence with attention. \cite{Ling2016} proposed an architecture of latent predictor networks with structured attention for generation of Magic: The Gathering and HearthStone cards implementation from card description in Java and Python. \cite{Chen2016} used latent attention to generate If-Then recipes for natural descriptions for IFTTT.com dataset. Remarkable idea of pointer networks introduced by \cite{NIPS2015_5866} allow to re-use parts of input sequence in the output. It was used by \cite{Zhong2017} along with reinforcement learning for generation of SQL queries from informal questions. \cite{Bhoopchand2016} 
 
-Example of abstract syntax tree could be seen on \ref{fig:ast}. This is a graphic representation of code snippet from \ref{tab:ast_example}. Full Python abstract grammar could be found in Appendix A.
+\section{Snippet generation}
+Instead of end-to-end translation of complex high-order requirements to software system into compiled instructions, code generation could be used as a handy \emph{snippet generation} tool. For example, \cite{little2009keyword} proposed a keyword based generation of Java code and implemented it in integrated development environment plugin for Eclipse. \cite{Gvero2015} addresses the problem of description to code generation as a machine translation task and use probabilistic context-free grammar model to generate a list of ranked expressions for a developer. Codehint \parencite{Galenson2014}, another plugin for Eclipse, explores Java virtual machine execution state to build search space of possible expressions for given description and then select the most likely one using the statistical model built offline from existing projects. NaturalJava \parencite{Price2000} accepts English sentences as input and uses decision trees to infer Java abstract syntax tree. \cite{pmlr-v37-allamanis15} created bimodal models of language and code to generate code from description and reversed for C\#.
 
-\begin{figure}
-\centering
-\includegraphics{Figures/ast}
-\decoRule
-\caption[Abstract Syntax Tree]{Example of abstract syntax tree.}
-\label{fig:ast}
-\end{figure}
+Another common approach in code generation is a creation of code for predefined context, in other words, input and output of a module. These solutions allow to fill gaps and create connections in the program template. \cite{Raychev2014} used statistical language models to synthesize the code for holes in application programming interfaces with a most likely sequence of statements. \cite{Jha2010} proposes code generation approach with I/O oracle, constrained to with input-output behavior and a set of available components. Search in the expression space performed with off-the-shelf Satisfiability Modulo Theory solvers. Domain-specific solution StreamBit \parencite{Solar-Lezama2005} shifts the task of most complex and error sensitive bit-level operations from programmer to a code generator. A developer only needs to write a sketch - a domain-specific description which then translated to C implementation. \cite{Srivastava2010} used verification tools to perform proof-theoretic program synthesis with given an input-output functional specification and a specification of the synthesized program’s looping structure.
 
-\section{Semantic structures}
-Theory of sentence analysis derives from the idea that the words of a sentence seem to combine into patterns and structures. Each word identified as different in terms of its function in a sentence. According to this function, for each word can be assigned its lexical category or part of speech, like a noun (\code{N}), adjective (\code{A}), or verb (\code{V}). 
+\section{Semantic language models}
+A semantic model of the natural language is a meaning representation which could be understood by the machine. Tasks like natural language understanding, paraphrase detection heavily relies on semantic models like abstract meaning representation \parencite{banarescu2013abstract} or combinatory categorial grammar \parencite{Clark2007}. This models also could be domain specific formal representation like natural language database interface \parencite{Zettlemoyer2012, berant2013semantic}, instructions for robot \parencite{artzi2013weakly} or smart home instructions \parencite{quirk2015language}. Since semantic meaning representation already contains formal instructions, their use for code generation task could significantly improve the model. 
 
-This system could be extended to the level of syntactic categories, combining words or other syntactic categories with similar function into phrases. Each phrase is characterized by the properties of the headword that it includes. For example, the headword of the subject of a sentence is a noun, so it is classified as a noun phrase (\code{NP}). A verb is regarded as the head of the sentence predicate, so predicate is classified as a verb phrase (\code{VP}). Rules which describe how lexical categories can be combined into syntactic categories is called rewriting rules. For example, a noun phrase category may be described as the parent of adjective and noun categories, and it may be represented by a rule of the form \code{NP -> A N}. 
+Previous years in the neural modeling of natural language dominated an idea that neural networks do not require any information about a syntactic or semantic structure of sentences. Outstanding results of deep neural networks in representation learning and structure parsing suggested to use a plain sequence of words as an input for a neural model and allow it to learn a representation of all other important features backpropagating the gradient of error. However, recent results of syntactic structures usage for machine translation \parencite{Chen2017} and reading comprehension \parencite{xie2017constituent} outperform the result of Sequence2Sequence models. To parse syntactic structures was used \emph{recursive neural networks} \parencite{Goller, socher2011parsing} and \emph{recurrent neural networks grammar} \parencite{Dyer2016}. Recursive neural networks also have shown good results for semantic \parencite{Tai2015} and dependency parsing \parencite{Zhu2015}. Another approach was addressed by \cite{Dong2016, Yin2017, Rabinovich2017}. In these works was used augmented decoder to generate a tree (syntax tree for syntactic parsing or abstract syntax tree for code generation) instead of a sequence. These models infer output structure and model search space was significantly reduced and prior knowledge about language syntax was used for valid code generation.
 
-A formalization of such rule-based sentence structure system is called a \emph{phrase-based grammar}. Grammar identified by the following constituents:
-$V_N$ is a non terminal vocabulary, which contains the lexical and syntactic category labels;
-$V_T$ is terminal vocabulary and it contains a set of words.
-$P$ identifies the collection of the production rules of the grammar.
-To illustrate this concept, I present a short grammar to parse a sentence "`good dogs like cats"' to its syntactic representation. The grammar for this example contains following vocabulary:
-\begin{equation}
-\begin{split}
-V_N = {S, NP, VP, A, N, V}\\
-V_T = {cats, dogs, like, nice}
-\end{split}
-\end{equation}
-The production rules for this grammar would be following:
-\begin{verbatim}
-S => NP VP
-NP => A N
-NP => N
-VP => V NP
-N => dogs
-N => cats
-V => like
-A => good
-\end{verbatim}
-Graphic representation of syntactic tree  of this sentence could be seen in \ref{fig:syntax_tree}.
+\section{Datasets}
+\emph{HearthStone} (HS) dataset \parencite{Ling2016} is a collection of Python classes which implements cards from the card game HearthStone. Each card has a set of attributes which is concatenated to produce the input sequence. The dataset contains 665 Python classes with descriptions.
 
-\begin{figure}
-\centering
-\includegraphics{Figures/syntaxtree}
-\decoRule
-\caption[Syntax tree]{Example of syntax tree.}
-\label{fig:syntax_tree}
-\end{figure}
+\emph{Django} dataset \parencite{Oda2015} contains a corpus of lines of Python code with manually annotated pseudocode from the Django web framework. Corpus contains 18,805 pairs of Python statements and corresponding English pseudo-code. 
 
-\section{Combinatory-categorial grammar}
+\cite{Barone2017} (BS) created the dataset of Python code with parallel descriptions from GitHub. It contains 150,370 triples of function declarations, docstrings and bodies. This dataset presents the most challenging task because it contains highly heterogeneous and noisy data. Django pseudo-code is already has a good alignment with target code and HeartStone code examples are mostly homogeneous and target specific domain.
 
-Phrase-structure grammars analyze the sentence recursively applying rewriting rules, starting from identification of the parts of speech or lexical categories of individual words. This rule governs, how words can be combined into phrases and sentences. Compared with phrase-structure grammars, \emph{combinatory-categorial grammars} do not contain a separate collection of category-combining rules. Lexical categories of words such adjectives and nouns describe the functions that determine how these words can combine with other categories. Each node in combinatory-categorial grammar tree can be translated into lambda calculus, though CCG is a transparent interface between syntax and semantics of a sentence. 
+\section{Comparison with other works}
 
-Let's consider an example. Adjective ‘good’ is in a category corresponding to a function that maps from the nouns into the noun phrases. The association of this item with a function looks like that:
+Keyword programming approach \parencite{little2009keyword} is tailored to Java syntax and requires substantial work to be reused in other languages. The same problem has plugin anyCode, described in \cite{Gvero2015}. Plugin Codehint \parencite{Galenson2014} implemented handy user experience for code generation. It uses specially marked comments as a place marker to insert generated code. However, its approach of usage Java virtual machine state as exploration space could not be transferred to dynamic typed languages like Python. Model, described in this work do not require to run program to generate target code. And, it is language agnostic and could be trained for any language requiring only appropriate dataset of code lines and descriptions.
 
-\begin{verbatim}
-good = NP/N 
-\end{verbatim}
+Architecture described in \cite{Zhong2017} shows interesting approach with pointer networks for reuse of description parts, for example variables or function names. However, it is domain specific as natural language database interface, thus it can not be compared with general use code generation. \cite{Chen2016} and \cite{Ling2016} also described only domain specific code generation.
 
-$\lambda x.good(x)$\footnote{To make connection of CCG categories with lambda calculus clear, I will complement each example of categorial operations with lines of lambda calculus.}
-
-\code{NP} on the left side of the slash character denotes function return value and \code{N} on the right side denotes function argument. This function could be resolved with forward function application operation, denoted by character \code{>}:
-
-\begin{verbatim}
-dogs => N
-good dogs => NP/N>N = NP
-\end{verbatim}
-
-$\lambda x.good(x)(DOGS)=good(DOGS)$
-
-With backward slash character \code{\textbackslash} right side category denotes function return and left side denotes function argument. Example:
-
-\begin{verbatim}
-bird => N
-flies => N\textbackslash S
-bird flies => N>N\textbackslash S = S
-\end{verbatim}
-
-$\lambda x.flies(x)$
-
-$\lambda x.flies(x)(BIRD)=flies(BIRD) $
-
-A verb such as ‘like’ is usually taking two arguments and associated as follows:
-
-\begin{verbatim}
-like => (S/NP)\textbackslash N
-cats => N
-like cats => (S/NP)\textbackslash N>N = S/NP
-\end{verbatim}
-
-$\lambda x.\lambda y.like(x, y)$
-
-$\lambda x.\lambda y.like(y, x)(CATS)=\lambda y.like(y, CATS)$
-
-The function \code{(S/NP)\\N} maps \code{N} to a range of functions of form \code{S/NP}.  Character \code{<} denotes backward function application. Final sentence example:
-
-\begin{verbatim}
-good dogs => NP
-like cats => S/NP
-good dogs like cats => NP<S/NP = S
-\end{verbatim}
-
-$\lambda y.like(y, CATS)$
-
-$\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
-
-\section{Word embeddings}
-The task of language modeling requires the transformation of words and documents into some vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches could require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
-
-\begin{figure}
-\centering
-\includegraphics{Figures/word_embeddings}
-\decoRule
-\caption[Word vectors]{Example of collinearity between two word vectors.}
-\label{fig:word_embeddings}
-\end{figure}
-
-Methods of \emph{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing in the same point as vector ‘aunt’ (see \ref{fig:word_embeddings} for example).
-
-\section{Long-short term memory network}
-Model of LSTM network is an extension of the simple recurrent network. It can store values in the hidden layer for a short or long period of time because it uses no activation function within its recurrent components. This makes able to backpropagate error gradient through long sequences of data without gradient vanishing or gradient exploding.
-
-\begin{figure}
-\centering
-\includegraphics{Figures/lstm}
-\decoRule
-\caption[Long-short term memory]{Long-short term memory network achitecture \parencite{lstm-picture}.}
-\label{fig:word_embeddings}
-\end{figure}
-
-Forget gate:
-
-\begin{equation}
-f_t = \sigma(W_f\cdot[h_{t-1},x_t] + b_f)
-\label{lstm:ft}
-\end{equation} 
-
-Input gate and new memory state ($\circ$ denotes entrywise product):
-
-\begin{equation}
-i_t=\sigma(W_i\cdot[h_{t-1}, x_t]+b_i)
-\label{lstm:input}
-\end{equation} 
-
-\begin{equation}
-\begin{split}
-\widetilde{C}_t = tanh(W_c\cdot[h_{t-1}, x_t]+b_C) \\
-C_t = f_t\circC_{t-1}+i_t\circ\widetilde{C}_t
-\label{lstm:c}
-\begin{split}
-\end{equation} 
-Gate for new hidden state:
-\begin{equation}
-o_t=\sigma(W_o[h_{t-1},x_t]+b_o)
-\label{lstm:o}
-\end{equation} 
-\begin{equation}
-h_t=o_t\circ tanh(C_t)
-\label{lstm:o}
-\end{equation} 
-\section{Sequence to sequence machine translation with attention}
-The task of machine translation can be formalized as mapping of a sequence of words in a source language to a sequence of words in a target language. This task can be solved with an \emph{encoder-decoder} model, which consists of two recurrent neural networks. The first RNN consumes input sequence step by step and encodes it into so-called thought vector. After encoding, the second RNN uses thought vector as its initial hidden state and decodes output sentence word by word.  Each word from decoder output is used as input for the next decoding step until the model outputs the end-of-sentence token. 
-
-Theoretically, a sufficiently large encoder-decoder model should be able to perform machine translation perfectly. However, to encode all words and dependencies between them in the arbitrary-length sentences the thought vector should have enormous length. It would require massive computational resources to train and use such architecture and though this approach is ineffective.
-
-This problem can be solved with attention technique. Its basic idea is to replace single vector representation of input sentence with references to representations of different words in it. On the encoding step, each word representation $h_e(t)$ stored as a column of matrix $H_e$. During the decoding step, hidden state of decoder network calculated as follows:
-
-\begin{equation}
-h_d(t) = enc([embed(w(t));c(t-1)], h_d(t-1))
-\label{attn:hd}
-\end{equation}
-
-\begin{figure}
-\centering
-\includegraphics{Figures/seq2seq}
-\decoRule
-\caption[Sequence to sequence model]{Sequence to sequence with attention model.}
-\label{fig:seq2seq}
-\end{figure}
-
-Elements of attention vector calculated with arbitrary attention score function (for example, vector product) for each pair of decoder and encoder representations:
-\begin{equation}
-	\begin{split}
-		\alpha_j(t) = attn_score(h_e(j), h_d(t))\\
-		\alpha_j(t) = softmax(\alpha_j(t))
-	\begin{split}
-\label{attn:alpha}
-\end{equation}
-Then context vector calculated as a weighted sum of encoder representations:
-\begin{equation}
-	c(t) = H_e\cdot\alpha(t)
-	\label{attn:c}
-\end{equation}
-\begin{equation}
-	P(t) = softmax(W_{hs}\cdot[h_d(t);c(t)])
-\label{attn:P}
-\end{equation}
-This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length though vector and though it can model natural language with adequate model size. An architecture of sequence to sequence model with attention can be seen at the \ref{fig:seq2seq}.
-
-\section{Recursive neural networks}
-The architecture of recurrent neural network reflects domain knowledge about conditional probability of target variable with previous values in a sequence. Representation of natural language can also be modeled as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language meaning representation.
-
-\begin{figure}
-\centering
-\includegraphics{Figures/rvnn}
-\decoRule
-\caption[RvNN flow]{Examle of recursive neural network flow.}
-\label{fig:rvnn}
-\end{figure}
-
-Topological structures with variable length could be modeled by neural networks recursively applying the same set of weight to each node. To model syntactic tree, each word is represented by corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of sentence good dog like cats could be modeled the following way:
-
-\begin{equation}
-\begin{split}
-v_{NP} = f(W\cdot[v_{good}, v_{dog}])\\
-v_{VP} = f(W\cdot[v_{like}, v_{cats}])\\
-v_S = f(W\cdot[v_{NP}, v_{VP}])
-\label{attn:rvnn_example}
-\end{split}
-\end{equation}
-
-where $f$ is any differentiable nonlinearity like $tanh$ or $relu$. The example of semantic tree parsing with recursive network presented on \ref{fig:rvnn}. 
+\cite{Yin2017} proposed to use vanilla LSTM encoder and augmented LSTM with additional neural connections to reflect the structure of abstract syntax tree. This idea shows have great potential as it infers code model in its structure. However, it is improved in my work by using Tree LSTM as encoder with parsed semantic tree as input.  Additionally, datasets Django and HearthStone used to evaluate \cite{Yin2017} project have few major flaws. Django do not actually contains natural descriptions of code, it is composed with parallel pseudo-code for each line of code, so it is already have a good alignment with target code. HearthStone contains Python implementation of game cards, though this code is domain specific and homogeneous. My project is evaluated on \cite{Barone2017} dataset of Python code descriptions. This dataset is mined from comments to code and functions of open source projects at GitHub, though it is highly heterogeneous and truly reflect the problem of general description to code translation.
