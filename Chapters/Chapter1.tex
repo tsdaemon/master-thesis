@@ -5,33 +5,23 @@
 \newcommand{\tabhead}[1]{\textbf{#1}}
 
 \section{Motivation}
-Software development described as a knowledge-intensive field \parencite{Robillard1999}. Implementation and maintenance of enterprise software system require broad knowledge of different programming languages and application programming interfaces. While in 2002 to create a website developer had to know HTML/CSS, PHP and MySQL, in 2017 it requires knowledge about frontend ecosystem, backend frameworks, and different NoSQL query languages. Documentation becomes a bottleneck while solving simple tasks, especially for new developers. Though software development involves regular use of search engines and Q\&A databases \parencite{Treude2011}. Code snippets from crowdsourced resources like StackOverflow usually adopted and reused in other projects. Developers often seek to find existing examples of working code to solve regular tasks instead of write and test it from scratch \parencite{Brandt2010}. And to find corresponding code snippet software developer first formulates its description as a query for search engine \parencite{Brandt2009}. 
+Software development is often described as a knowledge-intensive field \parencite{Robillard1999}. Implementation and maintenance of enterprise software system require broad knowledge of various programming languages and application of programming interfaces. While in 2002 to create a website a developer had to know HTML/CSS, PHP and MySQL, in 2017 this requires knowledge about frontend ecosystem, backend frameworks, and different NoSQL query languages. Documentation becomes a bottleneck while solving simple tasks, especially for new developers. Though software development involves regular use of search engines and Q\&A databases \parencite{Treude2011}. Code snippets from crowdsourced resources like StackOverflow usually adopted and reused in other projects. Developers often seek to find existing examples of working code to solve regular tasks instead of writing and testing it from scratch \parencite{Brandt2010}. And to find corresponding code snippet, the software developer first formulates its description as a query for search engine \parencite{Brandt2009}. 
 
-However, a web search is time-consuming and cause interruptions of the coding process. As an alternative, this description could be translated directly to code. Such translation tool would reduce the burden of remembering the details of a particular language or API and allow a developer to use his time for more creative aspects of development. I want to create dynamic, interactive and easy-to-use code generation tool which would allow to translate code description to actual implementation. 
+However, web search is a time-consuming process, which causes interruptions of the coding process. As an alternative, that description could be translated directly to code. Such translation tool would reduce the burden of remembering the details of a particular language or API and allow a developer to use his or her time for more creative aspects of development. That was a motivation of the present work: we wanted develop a model of description to code translation, which could transform informal instrcutions to actual language specific implementation.
+
+%to create dynamic, interactive and easy-to-use code generation tool which would allow to translate code description to actual implementation. 
 
 % It uses a code description to generate a required snippet of code just under the programmer cursor.
 
 %----------------------------------------------------------------------------------------
 
-\section{Goals}
+\section{Goals of the master thesis}
 
 \begin{enumerate}
-	\item Explore previous examples of code generation or code search tools.
-	\item Train Description2Code syntactic model and compare its performance with previous results.
-	\item Develop code generation plugin for PyCharm IDE.
+	\item To explore previous examples of code generation or code search tools.
+	\item To train Description2Code syntactic model and compare its performance to previous related works.
+	\item To develop code generation plugin for PyCharm IDE.
 \end{enumerate}
 
-%The paper is structured as follows: We first
-%describe the data collection process (Section 2)
-%and formally define our problem and our baseline
-%method (Section 3). Then, we propose our
-%extensions, namely, the structured attention mechanism
-%(Section 4) and the LPN architecture (Section
-%5). We follow with the description of our code
-%compression algorithm (Section 6). Our model
-%is validated by comparing with multiple benchmarks
-%(Section 7). Finally, we contextualize our
-%findings with related work (Section 8) and present
-%the conclusions of this work (Section 9).
-\section{Structure}
-In \ref{Chapter2} references to related publications and comparison with previous code generation projects is  presented. In \ref{Chapter3} code generation problem is described and theoretical background for methods used in this work is provided. In \ref{Chapter4} the idea of Tree2Tree model is explained and details about its structure is provided. In \ref{Chapter5} model evaluation results compared with previous model is presented. And finally, in \ref{Chapter6} the conclusion is drawn and points for further research is set.
+\section{Thesis structure}
+This work is structured as follows: In \ref{Chapter2} we presented references to related publications and comparison with previous code generation projects. In \ref{Chapter3} we provided theoretical background for methods used in this work. In \ref{Chapter4} we explained the idea of Tree2Tree model with all details about its structure and implementation. In \ref{Chapter5} we presented model evaluation results compared with previous models. And finally, in \ref{Chapter6} we drawn the conclusion and set the points for further research.
