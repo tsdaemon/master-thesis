@@ -116,10 +116,24 @@ $\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
 \section{Dependency parsing}
 Another approach to represent sentence semantical structure is \emph{dependency parsing}. \emph{Dependency grammar} is different from constituency grammars like CFG or CCG, which build sentence tree by applying rewrite rules to constitute high level phrases from low level syntactic categories and lexems. It also defines sentence structure as a graph, but without phrasal nodes like \code{NP} or \code{VP}. Instead each node represent one word which points to it dependent. Since such representation do not rely on established phrase word order it is well suited for the analysis of languages with free word order, such as Ukrainian.
 
-In Fig \ref{dependepncy_parse}
+\begin{figure}
+\centering
+\includegraphics{Figures/dependency_graph}
+\decoRule
+\caption[Syntax tree]{Dependency graph for sentence \textquote{nice dogs like cats}\footnote{Picture is created with tool \code{GrammarScope}\href{http://grammarscope.sourceforge.net/}}.}
+\label{fig:dependency_graph}
+\end{figure}
+
+In Fig \ref{fig:dependepncy_parse} sentence \textquote{nice dogs like cats} parsed to dependency graph. It consists of following dependencies: 
+
+\begin{verbatim}
+amod = adjectival modifier
+nmod = nominal modifier
+case = case marker
+\end{verbatim}
 
 \section{Word embeddings}
-The task of language modeling requires the transformation of words and documents into some vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches could require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
+The task of language modeling requires the transformation of words and documents into vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches would require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
 
 \begin{figure}
 \centering
