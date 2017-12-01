@@ -158,21 +158,21 @@ Model of LSTM network is an extension of the simple recurrent network. It can st
 
 Forget gate:
 \begin{equation}
-f_t = \sigma(W_f\cdot[h_{t-1},x_t] + b_f)
+f^{(t)} = \sigma(W_f\cdot[h^{(t-1)},x^{(t)}] + b_f)
 \label{lstm:ft}
 \end{equation} 
 
 Input gate and new memory state ($\circ$ denotes entrywise product):
 \begin{equation}
 
-i_t=\sigma(W_i\cdot[h_{t-1}, x_t]+b_i)
+i^{(t)}=\sigma(W_i\cdot[h^{(t-1)}, x^{(t)}]+b_i)
 \label{lstm:input}
 \end{equation} 
 
 \begin{equation}
 \begin{gathered}
-\widetilde{C}_t = tanh(W_c\cdot[h_{t-1}, x_t]+b_C) \\
-C_t = f_t\circ C_{t-1}+i_t\circ\widetilde{C}_t
+\widetilde{C}^{(t)} = tanh(W_c\cdot[h^{(t-1)}, x^{(t)}]+b_C) \\
+C^{(t)} = f_t\circ C^{(t-1)}+i_t\circ\widetilde{C}^{(t)}
 
 \label{lstm:c}
 \end{equation} 
@@ -181,14 +181,14 @@ New hidden state:
 \begin{equation}
 \begin{gathered}
 
-o_t=\sigma(W_o[h_{t-1},x_t]+b_o)
-h_t=o_t\circ tanh(C_t)
+o^{(t)}=\sigma(W_o[h^{(t-1)},x^{(t)}]+b_o)
+h^{(t)}=o^{(t)}\circ tanh(C^{(t)})
 
 \end{gathered}
 \label{lstm:h}
 \end{equation} 
 
-\section{Sequence to sequence machine translation with attention}
+\section{Sequence-to-sequence machine translation with attention}
 % http://phontron.com/class/mtandseq2seq2017/mt-spring2017.chapter8.pdf
 The task of machine translation can be formalized as mapping of a sequence of words in a source language to a sequence of words in a target language. This task can be solved with an \emph{encoder-decoder} model, which consists of two RNNs. The first RNN consumes input sequence step by step and encodes it into so-called thought vector. After encoding, the second RNN uses thought vector as its initial hidden state and decodes output sentence word by word.  Each word from decoder output is used as input for the next decoding step until the model outputs the end-of-sentence token. 
 
@@ -205,7 +205,7 @@ h_d(t) = enc([embed(w(t));c(t-1)], h_d(t-1))
 \centering
 \includegraphics{Figures/seq2seq}
 \decoRule
-\caption[Sequence to sequence model]{Sequence to sequence with attention model.}
+\caption[Seq2Seq model]{Seq2Seq with attention model.}
 \label{fig:seq2seq}
 \end{figure}
 
@@ -231,7 +231,7 @@ Then context vector is calculated as a weighted sum of encoder representations:
 \label{attn:P}
 \end{equation}
 
-This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence to sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
+This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
 
 \section{Recursive neural networks}
 % reflectes inductive bias
@@ -255,3 +255,33 @@ v_S = f(W\cdot[v_{NP}, v_{VP}])
 where $f$ is any differentiable non-linearity like $tanh$ or $ReLU$. The example of semantic tree parsing with recursive network is presented in Fig \ref{fig:rvnn}. 
 
 \section{Pointer networks}
+Neural network operates with vector representations of words which selected from predefined vocabulary. This imposes the problem of unknown words which don't have vector representation. This is especially important for the translation task where both input and output sequences could contain rare, special words or names. However, names of people or locations should not be translated but copied to target sequence. \cite{Vinyals2015} proposed solution of this problem with \emph{pointer network}. When decoding finished it calculates the probability of next word to be copied from an input sequence. Calculation of this probability step-by-step described below.
+
+Let's denote $H_{encoder}$ as a matrix of input sequence vectors and $h_{decoder}^{(t)}$ - decoder hidden state vector on encoding step $t$. First is calculated hidden state of pointer network:
+
+\begin{equation}
+    \begin{gathered}
+    
+    H_{encoder_pointer} = H_{encoder} \cdot W_{encoder}\\
+    
+    h_{decoder_pointer} = h_{decoder}^{(t)} \cdot W_{decoder}\\
+    
+    H_{pointer} = tanh(H_{encoder_pointer} + h_{decoder_pointer})\\
+    
+    \end{gathered}
+    \label{eq:pointer}
+\end{equation}
+
+Then each row from matrix $H_{pointer}$ is translated to one value and probability calculated as result of $softmax$:
+
+\begin{equation}
+    \begin{gathered}
+    
+    H_{prob} = H_{pointer} \cdot W_{pointer}\\
+    
+    P = softmax(H_{prob})\\
+    
+    \end{gathered}
+\end{equation}
+
+
