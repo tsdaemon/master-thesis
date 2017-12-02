@@ -4,15 +4,17 @@
 \section{Abstract syntax tree}
 The \emph{abstract syntax tree} is a tree representation of an abstract structure of programming code. For each expression or statement in the code, abstract syntax tree assigns the corresponding node. Abstract syntax tree could not contain all the details of the underlying code like parentheses or indentation, but its structure allows to interpret a code execution process unambiguously. The established grammar of abstract syntax tree reduces search space of the model and implies the validity of generated code.
 
-The Python \emph{abstract grammar} contains a set of production rules, composed of head node and multiple child nodes. For example, in Fig \ref{fig:ast} the first rule is used to generate the assignment of statement result to variable. It consists of the head node of type \code{Assign} and two child nodes of types \code{Name} and \code{Call}, respectively. Non-terminal nodes (the blue ones in \ref{fig:ast}) defines the general structure of the target code, while terminal nodes (the green ones) refer to symbol tokens, like variables, constants or operations. Full Python 3.6 abstract grammar can be found in \ref{AppendixA}. 
-
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics{Figures/ast}
+\includegraphics[width=5in]{Figures/ast}
 \decoRule
-\caption[Abstract Syntax Tree]{Abstract syntax tree of code snippet \code{ls = sorted(a, key=lambda x: x[1])}.}\footnote{Picture is created with Python library \code{showast}\href{https://github.com/hchasestevens/show_ast}}}
+\caption[Abstract Syntax Tree]{Abstract syntax tree of code snippet \code{ls = sorted(a, key=lambda x: x[1])}\protect\footnotemark.}
 \label{fig:ast}
 \end{figure}
+
+\footnotetext{Picture is created with Python library \href{https://github.com/hchasestevens/show_ast}{showast}.}
+
+The Python \emph{abstract grammar} contains a set of production rules, composed of head node and multiple child nodes. For example, in Fig \ref{fig:ast} the first rule is used to generate the assignment of statement result to variable. It consists of the head node of type \code{Assign} and two child nodes of types \code{Name} and \code{Call}, respectively. Non-terminal nodes (the blue ones) defines the general structure of the target code, while terminal nodes (the green ones) refer to symbol tokens, like variables, constants or operations. Full Python 3.6 abstract grammar can be found in Appendix \ref{AppendixA}. 
 
 \section{Semantic parsing}
 Theory of sentence analysis is derived from the idea that the words of a sentence seem to combine into patterns and structures. Each word is classified as a different in terms of its function in a sentence. According to this function, to each word there can be assigned its lexical category or part of speech, like a noun (\code{N}), adjective (\code{A}), or verb (\code{V}). 
@@ -66,7 +68,7 @@ Consider an example. Adjective \textquote{good} is in a category corresponding t
 good = NP/N 
 \end{verbatim}
 
-$\lambda x.good(x)$\footnote{To make connection of CCG categories with lambda calculus clear, we will complement each example of categorial operations with lines of lambda calculus.}
+$\lambda x.good(x)$\footnote{To make connection of CCG categories with lambda calculus clear, we will complement each example of categorial operations with corresponding lines of lambda calculus.}
 
 \code{NP} on the left side of the slash character denotes function return value and \code{N} on the right side denotes function argument. This function could be resolved with forward function application operation, denoted by character \code{>}:
 
