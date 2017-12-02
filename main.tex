@@ -52,6 +52,17 @@ headsepline, % Uncomment to get a line under the header
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 
+
+\newenvironment{codelist}
+    {\begin{verbatim}}
+    {\end{verbatim}}
+
+\newcounter{myverb}
+\BeforeBeginEnvironment{codelist}{%
+\refstepcounter{myverb}%
+\noindent\textbf{Code listing \themyverb}%
+}
+
 %----------------------------------------------------------------------------------------
 %	MARGIN SETTINGS
 %----------------------------------------------------------------------------------------

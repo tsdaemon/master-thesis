@@ -2,32 +2,95 @@
 \label{Chapter4}
 
 \section{Code generation problem}
-Given a natural language description $\Lambda$ our task is to infer the Python code $C$ based on the intent of the $\Lambda$. This task is solved by a generation of an underlying abstract syntax tree $\Tau$. $\Tau$ can be deterministically converted to a Python code $C$, though in this work source code $C$ and its abstract syntax tree are considered equivalent. A probabilistic grammar model of generating an abstract syntax tree $\Tau$ given $\Lambda$ is defined as $p(\Tau|\Lambda)$. The best corresponding syntax tree $\Tau$ is defined as
+Given a natural language description $x$ our task is to infer the Python code $y$ based on the intent of the $x$. This task is solved by a generation of an underlying abstract syntax tree $\tau$. $\tau$ can be deterministically converted to a Python code $y$, though in this work source code $y$ and its abstract syntax tree are considered equivalent. A probabilistic grammar model of generating an abstract syntax tree $\tau$ given description $x$ is defined as $P(\tau|x)$. The best corresponding syntax tree $\tau$ is defined as
 \begin{equation}
-\Tau=\underset{\Tau}{\operatorname{argmax}}\, p(\Tau|\Lambda)
+\hat{\tau}=\underset{\tau}{\operatorname{argmax}} p(\tau|x)
 \label{eqn:main_problem}
 \end{equation}
-Probability \ref{eqn:main_problem} is modeled with neural model with set of weights $\theta$. To learn value of $\theta$ I use set of training examples, which consist of tuples $(\Tau^{\Lambda}, \Lambda)$. The parameters of the model are learnt by maximizing the conditional log-probabilities for the training set:
+Probability from Eq. \ref{eqn:main_problem} is modeled with neural model with set of weights $\theta$. To learn values of $\theta$ we used set of training examples, which consist of tuples $(\tau^{(x)}, x)$. The parameters of the model are learned by maximizing the conditional log-probabilities for the training set:
 \begin{equation}
-\theta=\underset{\theta}{\operatorname{argmax}}\, \sum{\Tau^{\Lambda}, \Lambda} log p(\Tau^{\Lambda}|\Lambda; \theta)
+\theta=\underset{\theta}{\operatorname{argmax}} \sum_{\tau^{(x)}, x} log \: P(\tau^{(x)}|x; \theta)
 \label{eqn:mle}
 \end{equation}
-\section{Abstract syntax tree decoding}
-The output of decoder is abstract syntax tree which consist of terminal and non-terminal nodes (\ref{fig:ast}). As suggested in \cite{Yin2017}, I factorize the generation process of AST into sequential application of actions of two types:
+
+\section{Abstract syntax tree statistical model}
+The output of decoder is abstract syntax tree which consist of terminal and non-terminal nodes. As suggested in work of \cite{Yin2017}, we factorized the generation process of AST into sequential application of actions of two types:
 \begin{itemize}
 	\item \code{ApplyRule[r]} corresponds to non-terminal nodes. It applies a production rule \code{r} to the current derivation tree.
 	\item \code{GetToken[v]} correspond to terminal nodes. It finishes the node by appending a token \code{v}.
 \end{itemize}
 
-%
-% Add generation process example for fig:ast
-%
+Let's consider as example AST from Fig. \ref{fig:ast}. It generation consist of following actions:
 
-Under this grammar model, the probability of generating an AST $\Tau$ is factorized to rules $a$ as:
+\begin{codelist}
+ApplyRule[root => (stmt*)] (t=0)
+    ApplyRule[stmt => (Assign)] (t=1)
+        ApplyRule[Assign => (expr*{targets}), (expr{value})] (t=2)
+            ApplyRule[expr* => (expr)]
+                ApplyRule[expr => (Name)]
+                    ApplyRule[Name -> (str{id})]
+                        GetToken["ls"]
+                        GetToken["<eos>"]
+            ApplyRule[expr => (Call)]
+                ApplyRule[Call => (expr{func}), (expr*{args}), (keyword*{keywords})]
+                    ApplyRule[expr => (Name)]
+                        ApplyRule[Name -> (str{id})]
+                            GetToken["sorted"]
+                            GetToken["<eos>"]
+                    ApplyRule[expr* => expr]
+                        ApplyRule[expr => (Name)]
+                            ApplyRule[Name => (str{id})]
+                                GetToken["a"]
+                                GetToken["<eos>"]
+                    ApplyRule[keyword* => keyword]
+                        ApplyRule[keyword => (str{arg}), (expr{value})]
+                            GetToken["key"]
+                            GetToken["<eos>"]
+                            ApplyRule[expr => (Lambda)]
+...
+ApplyRule[Lambda => (arguments args), (expr body)]
+    ApplyRule[arguments => (arg* args)]
+        ApplyRule[arg* => arg]
+            ApplyRule[arg => (str{arg})]
+                GenToken["x"]
+                GetToken["<eos>"]
+    ApplyRule[expr => Subscript]
+        ApplyRule[Subscript => (expr{value}), (slice{slice})]
+            ApplyRule[expr => (Name)]
+                ApplyRule[Name => (str{id})]
+                    GetToken["x"]
+                    GetToken["<eos>"]
+            ApplyRule[slice => (Index)]
+                ApplyRule[Index => (expr{value})]
+                    ApplyRule[expr => (Num)]
+                        ApplyRule[Num => (int{n})]
+                            GetToken[1]
+\end{codelist}
+\label{code:ast_production}
+
+Under this grammar model, the probability of generating an AST $\tau$ is factorized as:
 \begin{equation}
-p(\Tau|\Lambda) = \prod{N}{n=1} p(a_n|\Lambda, a_{<n})
+p(\tau|x) = \prod{N}{n=1} p(a_n|x, a_{<n})
 \label{eqn:factorized}
 \end{equation}
+where $a_t$ is the action taken at the time step $t$ and $a_{<t}$ is the sequence of actions before $t$. 
+
+For each time step $t$ model selects next action with maximal probability - \code{ApplyRule} to grow the tree or \code{GenToken} to fill values in terminal nodes like \code{str}. 
+
+\subsection{ApplyRule actions}
+
+At any moment of generation tree contains single frontier node (for time step $t$ it is $n_{f_t}$). Action \code{ApplyRule} expand frontier node in depth-first, left-to-right traversal of the tree. Production rule $r$ expands $n_{f_t}$ by appending all child nodes specified by the selected production. For example, in \ref{code:ast_production}
+
+\textbf{Unary closures}. 
+
+\subsection{GenToken actions}
+
+
+
+
+
+\textbf{Complex token generation}. Each string generation ends with special end-of-string token \code{GetToken["<eos>"]}. This way complex tokens like function name \code{sort_by_second_index} could be split on parts, thus reduce token vocabulary and allow complex rare token to be constructed from the it constituents.
+
 
 \section{Encoder}
 % A* CCG Parsing with a Supertag and Dependency Factored Model
