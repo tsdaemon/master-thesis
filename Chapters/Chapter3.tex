@@ -114,17 +114,22 @@ $\lambda y.like(y, CATS)$
 $\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
 
 \section{Dependency parsing}
-Another approach to represent sentence semantical structure is \emph{dependency parsing}. \emph{Dependency grammar} is different from constituency grammars like CFG or CCG, which build sentence tree by applying rewrite rules to constitute high level phrases from low level syntactic categories and lexems. It also defines sentence structure as a graph, but without phrasal nodes like \code{NP} or \code{VP}. Instead each node represent one word which points to it dependent. Since such representation do not rely on established phrase word order it is well suited for the analysis of languages with free word order, such as Ukrainian.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics{Figures/dependency_graph}
+\includegraphics[width=5in]{Figures/dependency_graph}
 \decoRule
-\caption[Syntax tree]{Dependency graph for sentence \textquote{nice dogs like cats}\footnote{Picture is created with tool \code{GrammarScope}\href{http://grammarscope.sourceforge.net/}}.}
+\caption[Syntax tree]{Dependency graph for sentence \textquote{nice dogs like cats}\protect\footnotemark.}
 \label{fig:dependency_graph}
 \end{figure}
 
-In Fig \ref{fig:dependepncy_parse} sentence \textquote{nice dogs like cats} parsed to dependency graph. It consists of following dependencies: 
+\footnotetext{Picture is created in \href{http://grammarscope.sourceforge.net/}{GrammarScope}.}
+
+Another approach to represent sentence semantical structure is \emph{dependency parsing}. \emph{Dependency grammar} is different from constituency grammars like CFG or CCG, which build sentence tree by applying rewrite rules to constitute high level phrases from low level syntactic categories and lexems. It also defines sentence structure as a graph, but without phrasal nodes like \code{NP} or \code{VP}. Instead each node represent one word which points to it dependent. Since such representation do not rely on established phrase word order it is well suited for the analysis of languages with free word order, such as Ukrainian.
+
+
+
+In Fig \ref{fig:dependency_graph} sentence \textquote{nice dogs like cats} parsed to dependency graph. It consists of following dependencies: 
 
 \begin{verbatim}
 amod = adjectival modifier
@@ -133,9 +138,8 @@ case = case marker
 \end{verbatim}
 
 \section{Word embeddings}
-The task of language modeling requires the transformation of words and documents into vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches would require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics{Figures/word_embeddings}
 \decoRule
@@ -143,12 +147,29 @@ The task of language modeling requires the transformation of words and documents
 \label{fig:word_embeddings}
 \end{figure}
 
+The task of language modeling requires the transformation of words and documents into vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches would require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
+
+
+
 Methods of \emph{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing to the same point as vector ‘aunt’ (see Fig \ref{fig:word_embeddings} for example).
 
 \section{Long-short term memory network}
 Model of LSTM network is an extension of the simple recurrent network. It can store values in the hidden layer for a short or long period of time because it uses no activation function within its recurrent components. This makes it possible to backpropagate error gradient through long sequences of data without gradient vanishing or gradient exploding.
 
-\begin{figure}
+At the time step $t$ LSTM consumes previous value of hidden state $h^{(t-1)}$, memory cell $c^{(t-1)}$ and input vector $x^{(t)}$. The new value of memory cell uses gates to forget part of previous value and remember new value. Forget gate calculation:
+
+\begin{equation}
+f^{(t)} = \sigma(W_f\cdot[h^{(t-1)},x^{(t)}] + b_f)
+\label{lstm:ft}
+\end{equation} 
+
+Input gate:
+\begin{equation}
+i^{(t)}=\sigma(W_i\cdot[h^{(t-1)}, x^{(t)}]+b_i)
+\label{lstm:input}
+\end{equation} 
+
+\begin{figure}[h]
 \centering
 \includegraphics{Figures/lstm}
 \decoRule
@@ -156,34 +177,22 @@ Model of LSTM network is an extension of the simple recurrent network. It can st
 \label{fig:word_embeddings}
 \end{figure}
 
-Forget gate:
-\begin{equation}
-f^{(t)} = \sigma(W_f\cdot[h^{(t-1)},x^{(t)}] + b_f)
-\label{lstm:ft}
-\end{equation} 
-
-Input gate and new memory state ($\circ$ denotes entrywise product):
-\begin{equation}
-
-i^{(t)}=\sigma(W_i\cdot[h^{(t-1)}, x^{(t)}]+b_i)
-\label{lstm:input}
-\end{equation} 
-
+New memory state ($\circ$ denotes entrywise product):
 \begin{equation}
 \begin{gathered}
 \widetilde{C}^{(t)} = tanh(W_c\cdot[h^{(t-1)}, x^{(t)}]+b_C) \\
-C^{(t)} = f_t\circ C^{(t-1)}+i_t\circ\widetilde{C}^{(t)}
 
+C^{(t)} = f_t\circ C^{(t-1)}+i_t\circ\widetilde{C}^{(t)}
+\end{gathered}
 \label{lstm:c}
 \end{equation} 
 
 New hidden state:
 \begin{equation}
 \begin{gathered}
+o^{(t)}=\sigma(W_o[h^{(t-1)},x^{(t)}]+b_o) \\
 
-o^{(t)}=\sigma(W_o[h^{(t-1)},x^{(t)}]+b_o)
 h^{(t)}=o^{(t)}\circ tanh(C^{(t)})
-
 \end{gathered}
 \label{lstm:h}
 \end{equation} 
@@ -203,7 +212,7 @@ h_d(t) = enc([embed(w(t));c(t-1)], h_d(t-1))
 
 \begin{figure}
 \centering
-\includegraphics{Figures/seq2seq}
+\includegraphics[width=5in]{Figures/seq2seq.pdf}
 \decoRule
 \caption[Seq2Seq model]{Seq2Seq with attention model.}
 \label{fig:seq2seq}
@@ -234,15 +243,18 @@ Then context vector is calculated as a weighted sum of encoder representations:
 This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
 
 \section{Recursive neural networks}
-% reflectes inductive bias
-The architecture of recurrent neural network reflects domain knowledge about conditional probability of target variable with previous values in a sequence. Representation of natural language can also be modeled as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language meaning representation.
-\begin{figure}
+
+% reflects domain knowledge
+The architecture of recurrent neural network contains inductive bias about conditional probability of target variable with previous values in a sequence. Representation of natural language can also be modeled as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language meaning representation.
+
+\begin{figure}[h]
 \centering
 \includegraphics{Figures/rvnn}
 \decoRule
 \caption[RvNN flow]{Examle of recursive neural network flow.}
 \label{fig:rvnn}
 \end{figure}
+
 Topological structures with variable length could be modeled by neural networks recursively applying the same set of weights to each node. To model syntactic tree, each word is represented by corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of sentence \textquote{good dog like cats} could be modeled i the following way:
 \begin{equation}
 \begin{split}
@@ -252,21 +264,21 @@ v_S = f(W\cdot[v_{NP}, v_{VP}])
 \label{rvnn:example}
 \end{split}
 \end{equation}
-where $f$ is any differentiable non-linearity like $tanh$ or $ReLU$. The example of semantic tree parsing with recursive network is presented in Fig \ref{fig:rvnn}. 
+where $f$ is any differentiable non-linearity like $tanh$ or $ReLU$. The example of semantic tree parsing with recursive network is presented in Fig \ref{fig:rvnn}.
 
 \section{Pointer networks}
-Neural network operates with vector representations of words which selected from predefined vocabulary. This imposes the problem of unknown words which don't have vector representation. This is especially important for the translation task where both input and output sequences could contain rare, special words or names. However, names of people or locations should not be translated but copied to target sequence. \cite{Vinyals2015} proposed solution of this problem with \emph{pointer network}. When decoding finished it calculates the probability of next word to be copied from an input sequence. Calculation of this probability step-by-step described below.
+Neural network operates with vector representations of words which selected from predefined vocabulary. This imposes the problem of unknown words which don't have vector representation. This is especially important for the translation task where both input and output sequences could contain rare, special words or names. However, names of people or locations should not be translated but copied to target sequence. \cite{Vinyals2015} proposed solution of this problem with \emph{pointer network}. For each decoding step it calculates the probability of next word to be copied from an input sequence. Calculation of this probability described below step-by-step.
 
-Let's denote $H_{encoder}$ as a matrix of input sequence vectors and $h_{decoder}^{(t)}$ - decoder hidden state vector on encoding step $t$. First is calculated hidden state of pointer network:
+Let's denote $H_{encoder}$ as a matrix of encoder output vectors and $h_{decoder}^{(t)}$ - decoder output vector on decoding step $t$. First is calculated hidden state of pointer network:
 
 \begin{equation}
     \begin{gathered}
     
-    H_{encoder_pointer} = H_{encoder} \cdot W_{encoder}\\
+    H_{enc.pointer} = H_{encoder} \cdot W_{encoder}\\
     
-    h_{decoder_pointer} = h_{decoder}^{(t)} \cdot W_{decoder}\\
+    h_{dec.pointer} = h_{decoder}^{(t)} \cdot W_{decoder}\\
     
-    H_{pointer} = tanh(H_{encoder_pointer} + h_{decoder_pointer})\\
+    H_{pointer} = tanh(H_{enc.pointer} + h_{dec.pointer})\\
     
     \end{gathered}
     \label{eq:pointer}
