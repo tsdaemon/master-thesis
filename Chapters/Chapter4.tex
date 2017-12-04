@@ -13,7 +13,7 @@ Probability from Eq. \ref{eqn:main_problem} is modeled with neural model with se
 \label{eqn:mle}
 \end{equation}
 
-\section{Abstract syntax tree statistical model}
+\section{Abstract syntax tree generation}
 The output of decoder is abstract syntax tree which consist of terminal and non-terminal nodes. As suggested in work of \cite{Yin2017}, we factorized the generation process of AST into sequential application of actions of two types:
 \begin{itemize}
 	\item \code{ApplyRule[r]} corresponds to non-terminal nodes. It applies a production rule \code{r} to the current derivation tree.
@@ -22,10 +22,11 @@ The output of decoder is abstract syntax tree which consist of terminal and non-
 
 Let's consider as example AST from Fig. \ref{fig:ast}. It generation consist of following actions:
 
-\begin{codelist}
-ApplyRule[root => (stmt*)] (t=0)
-    ApplyRule[stmt => (Assign)] (t=1)
-        ApplyRule[Assign => (expr*{targets}), (expr{value})] (t=2)
+\begin{codelist}{AST production sequence.}
+\begin{verbatim}
+ApplyRule[root => (stmt*)]
+    ApplyRule[stmt => (Assign)]
+        ApplyRule[Assign => (expr*{targets}), (expr{value})]
             ApplyRule[expr* => (expr)]
                 ApplyRule[expr => (Name)]
                     ApplyRule[Name -> (str{id})]
@@ -64,48 +65,89 @@ ApplyRule[Lambda => (arguments args), (expr body)]
                 ApplyRule[Index => (expr{value})]
                     ApplyRule[expr => (Num)]
                         ApplyRule[Num => (int{n})]
-                            GetToken[1]
-\end{codelist}
+                            GetToken["1"]
+                            GetToken["<eos>"]
+\end{verbatim}
 \label{code:ast_production}
+\end{codelist}
 
 Under this grammar model, the probability of generating an AST $\tau$ is factorized as:
 \begin{equation}
 p(\tau|x) = \prod{N}{n=1} p(a_n|x, a_{<n})
-\label{eqn:factorized}
+\label{eqn:tree_probability}
 \end{equation}
 where $a_t$ is the action taken at the time step $t$ and $a_{<t}$ is the sequence of actions before $t$. 
 
-For each time step $t$ model selects next action with maximal probability - \code{ApplyRule} to grow the tree or \code{GenToken} to fill values in terminal nodes like \code{str}. 
+For each time step $t$ model selects next action with maximal probability - \code{ApplyRule} to grow the tree or \code{GenToken} to fill values in terminal nodes. 
 
 \subsection{ApplyRule actions}
 
-At any moment of generation tree contains single frontier node (for time step $t$ it is $n_{f_t}$). Action \code{ApplyRule} expand frontier node in depth-first, left-to-right traversal of the tree. Production rule $r$ expands $n_{f_t}$ by appending all child nodes specified by the selected production. For example, in \ref{code:ast_production}
+At any moment of generation tree contains single frontier node (for time step $t$ it is $n_{f_t}$). Action \code{ApplyRule} expand frontier node in depth-first, left-to-right traversal of the tree. Production rule $r$ expands $n_{f_t}$ by appending all child nodes specified by the selected production. For example, in Ls. \ref{code:ast_production} rule for node \code{Call} extends this node with three new nodes: \code{expr{func}}, \code{expr*{args}}, \code{keyword*{keywords})}. 
+When $n_{f_t}$ is a terminal node, which can not be expanded further, the next action must be \code{GenToken}
 
-\textbf{Unary closures}. 
+\textbf{Unary closures}. Sometimes, generating an AST requires applying a chain of unary productions. For example, in \ref{code:ast_production} it takes three time step to generate target for \code{Assign} statement:
+\begin{verbatim}
+ApplyRule[expr* => (expr)]
+    ApplyRule[expr => (Name)]
+        ApplyRule[Name -> (str{id})]
+\end{verbatim}
+Such formal redundancy allows to have smaller production rule grammar but would increase model complexity. Thus, they can be replaced with one action by taking the closure of the chain of unary productions:
+\begin{verbatim}
+ApplyRule[expr* => (str{id})]
+\end{verbatim}
+
+We tested our model both with and without unary closures.
 
 \subsection{GenToken actions}
+If tree reached leaf and $n_{f_t}$ is terminal node, the \code{GenToken} actions used to fill this node. Each token generation ends with special end-of-string token \code{"<eos>"}. This way complex tokens like function name \code{sortBySecondIndex} can be split on parts, thus reduce token vocabulary and allow complex rare token to be constructed from its constituents. After the end-of-string token generation model proceeds to the next frontier node.
 
+Vocabulary of predefined token values can be inferred from the dataset. However, it is clear that this vocabulary will not cover all possible token for any environment. To cope with this problem, values can be copied directly from the input sequence. Therefore, it allows model to use literals and names from the code description.
 
+\section{Action probabilities}
+Probabilities in Eq. \ref{eqn:tree_probability} estimated by neural attentional encoder-decoder model. Both encoder and decoder informational flow is structured by syntactic trees. 
 
+\subsection{Encoder}
+Input NL description $x$ consist of two parts. First is a sequence of word vectors $\{w^(i)\}^n_{i=1}$. Second is a description tree $T$ which consists of $m$ nodes $\{T_k\}^m_{k=1}$, where $m\geq n$. Details about the description tree parsing can be found in section \ref{preprocessing}. For all $k \leq n$, each tree node $T_k$ have a corresponding input vector from word sequences $w_k$. For $k > n$, input vector for $T_k$ is padding-vector. Each tree node $T_k$ have set of children nodes $ch(T_k)={T_a, T_b,...,T_d}$. Therefore a single input element $x_k$ can be defined as a tuple $(T_k, w_k, ch(T_k))$:
 
+\begin{equation}
+ x_k =
+  \begin{cases}
+    (T_k, w_k, ch(T_k))       & \quad \text{if } k\leq n\\
+    (T_k, w_{pad}, ch(T_k))  & \quad \text{if } k > n
+  \end{cases}
+\label{eq:enc_input}
+\end{equation}
 
-\textbf{Complex token generation}. Each string generation ends with special end-of-string token \code{GetToken["<eos>"]}. This way complex tokens like function name \code{sort_by_second_index} could be split on parts, thus reduce token vocabulary and allow complex rare token to be constructed from the it constituents.
+To encode this structures we used Tree-LSTM from \cite{Tai2015}\footnote{Used pytorch implementation from \href{https://github.com/dasguptar/treelstm.pytorch}}. Similary to SRvN, described in section \ref{sec:rvnn}, this model starts from the tree leaves, and recursively computes node embedding $h_k$ for each $x_k$ using values of memory cell $\{c_i\}^{n}_{i=1} = memory(ch(T_k))$ and values of previous node embeddings $\{h_i\}^{n}_{i=1} = hidden(ch(T_k))$:
 
+\begin{equation}
+\begin{gathered}
+    \hat{h_k} = \sum^{n}_{i=1}h_i \\
+    
+    i_k = \sigma(W_i\cdot[\hat{h_k}, w_k]+b_i) \\
+    o_k = \sigma(W_o\cdot[\hat{h_k}, w_k]+b_o) \\
+    u_k = tanh(W_u\cdot[\hat{h_k}, w_k]+b_u) \\
+    
+\end{gathered}
+\label{eq:tree_lstm1}
+\end{equation}
 
-\section{Encoder}
-% A* CCG Parsing with a Supertag and Dependency Factored Model
-% https://github.com/dasguptar/treelstm.pytorch
-% 10.5281/zenodo.1012577 - tqdm
-% https://nlp.stanford.edu/pubs/glove.pdf 
+\begin{equation}
+\begin{gathered}
+    H = []
+    f_k = \sigma(W_{fh}\cdot H + W_{fx} \cdot w_k + b_f)
+
+\end{gathered}
+\label{eq:tree_lstm2}
+\end{equation}
+
+% 
 % https://github.com/dasguptar/treelstm.pytorch
 % https://web.stanford.edu/~jurafsky/slp3/
 % https://nlp.stanford.edu/software/stanford-dependencies.shtml
 % Danqi Chen and Christopher D Manning. 2014. A Fast and Accurate Dependency Parser using Neural Networks. Proceedings of EMNLP 2014
 % Jonathan Berant, Andrew Chou, Roy Frostig, Percy Liang. Semantic Parsing on Freebase from Question-Answer Pairs. Empirical Methods in Natural Language Processing (EMNLP), 2013.
 % CCG - mark steedman
-
-
-\section{Attention}
 
 \section{Learning}
 Beam search.

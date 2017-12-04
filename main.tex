@@ -40,7 +40,7 @@ headsepline, % Uncomment to get a line under the header
 
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
-
+\usepackage{listings}
 \usepackage{amssymb}
 \usepackage{hyperref}
 
@@ -52,17 +52,10 @@ headsepline, % Uncomment to get a line under the header
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 
-
-\newenvironment{codelist}
-    {\begin{verbatim}}
-    {\end{verbatim}}
-
-\newcounter{myverb}
-\BeforeBeginEnvironment{codelist}{%
-\refstepcounter{myverb}%
-\noindent\textbf{Code listing \themyverb}%
-}
-
+\newcounter{codelist}[section]
+\newenvironment{codelist}[1]
+    {\refstepcounter{codelist}\par\medskip\noindent {\bfseries Ls. \thecodelist.   \hspace{0.1cm}#1~}}
+    {\medskip}
 %----------------------------------------------------------------------------------------
 %	MARGIN SETTINGS
 %----------------------------------------------------------------------------------------
@@ -201,6 +194,8 @@ Arvilab
 Yin & Neubig
 
 CoreNLP and EasyCCG
+
+PyTorch team
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
@@ -224,6 +219,7 @@ CoreNLP and EasyCCG
 \textbf{DNN} & \textbf{D}eep \textbf{N}eural \textbf{N}etwork\\
 \textbf{LSTM} & \textbf{L}ong \textbf{S}hort-\textbf{T}erm \textbf{M}emory\\
 \textbf{NMT} & \textbf{N}eural \textbf{M}achine \textbf{T}ranslation\\
+\textbf{NL} & \textbf{N}atural \textbf{L}anguage\\
 \textbf{PBG}  & \textbf{P}hrase \textbf{B}ased \textbf{G}rammar \\
 \textbf{PCFG}  & \textbf{P}robabilistic \textbf{C}ontext-\textbf{F}ree \textbf{G}rammar\\
 \textbf{ReLU}  & \textbf{R}ectified \textbf{L}inear \textbf{U}nit\\
@@ -231,6 +227,7 @@ CoreNLP and EasyCCG
 \textbf{RvNN} & \textbf{R}ecursive \textbf{N}eural \textbf{N}etwork\\
 \textbf{Seq2Seq} & \textbf{S}equence-to-\textbf{S}equence\\
 \textbf{Seq2Tree} & \textbf{S}equence-to-\textbf{T}ree\\
+\textbf{SRvN} & \textbf{S}imple \textbf{R}ecursive \textbf{N}etwork \\
 \textbf{Tree2Tree} & \textbf{T}ree-to-\textbf{T}ree\\
 
 
@@ -242,16 +239,33 @@ CoreNLP and EasyCCG
 
 \begin{symbols}{ll} % Include a list of Symbols (a two column table)
 
-$c$ & program code \\
+$\cdot$ & matrix multiplication \\
+$\circ$ & entrywise multiplication \\
+\addlinespace 
 $p(y|x)$ & probability of $y$ given $x$ \\
-$h_e(t)$ & encoder hidden state vector for time step $t$ \\
-$h_d(t)$ & decoder hidden state vector for time step $t$ \\
-$v_{word}$ & word embedding vector \\
+$\tau$ &
+\addlinespace
+$h^{(t)}$ & LSTM hidden state vector for sequence step $t$ \\
+$c^{(t)}$ & LSTM memory cell vector for sequence step $t$ \\
+$f^{(t)}$ & LSTM forget gate vector for sequence step $t$ \\
+$i^{(t)}$ & LSTM input gate vector for sequence step $t$ \\
+$o^{(t)}$ & LSTM output gate vector for sequence step $t$ \\
+
+$h_e^{(t)}$ & encoder embedding vector for encoding step $t$ \\
+$H_e^$ & encoder embeddings matrix \\
+$h_d^{(t)}$ & decoder embedding vector for decoding step $t$ \\
+$\alpha^{(t)}$ & Attention vector for decoding step $t$  \\
+
+$w$ & word embedding vector \\
+$W$ & linear transformation weights \\
+$b$ & linear transformation bias \\
+
+$embed$ & word embedding operation  \\
+$softmax & normalized exponential function \\
+$relu$ & rectifier function \\
+$tanh$ & hyperbolic tangent \\
 \addlinespace 
-\code{embed} & word embedding operation  \\
-\code{softmax} & normalized exponential function \\
-\addlinespace 
-$\alpha$ & Attention vector  \\
+
 
 \end{symbols}
 

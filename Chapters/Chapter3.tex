@@ -60,7 +60,7 @@ Phrase-based grammar might also be refered as \emph{context-free grammar}, beaus
 \end{figure}
 
 \section{Combinatory-categorial grammar}
-Phrase-structure grammars analyze the sentence recursively applying rewriting rules, starting from identification of the parts of speech or lexical categories of individual words. This rule governs how words can be combined into phrases and sentences. Compared with phrase-structure grammars, \emph{combinatory-categorial grammars} do not contain a separate collection of category-combining rules. Lexical categories of words such as adjectives and nouns describe the functions that determine how these words can combine with other categories. Each node in CCG tree can be translated into lambda calculus, thus CCG is a transparent interface between syntax and semantics of a sentence. 
+Phrase-structure grammars analyze the sentence recursively applying rewriting rules, starting from identification of the parts of speech or lexical categories of individual words. This rule governs how words can be combined into phrases and sentences. Compared with phrase-structure grammars, \emph{combinatory-categorial grammars} do not contain a separate collection of category-combining rules. Lexical categories of words such as adjectives and nouns describe the functions that determine how these words can combine with other categories. Each node in CCG tree can be translated into lambda calculus, thus CCG is a transparent interface between syntax and semantics of a sentence.
 
 Consider an example. Adjective \textquote{good} is in a category corresponding to a function that maps from the nouns into the noun phrases. The association of this item with a function looks like that:
 
@@ -121,15 +121,13 @@ $\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
 \centering
 \includegraphics[width=5in]{Figures/dependency_graph}
 \decoRule
-\caption[Syntax tree]{Dependency graph for sentence \textquote{nice dogs like cats}\protect\footnotemark.}
+\caption[Dependency graph]{Dependency graph for sentence \textquote{nice dogs like cats}\protect\footnotemark.}
 \label{fig:dependency_graph}
 \end{figure}
 
 \footnotetext{Picture is created in \href{http://grammarscope.sourceforge.net/}{GrammarScope}.}
 
 Another approach to represent sentence semantical structure is \emph{dependency parsing}. \emph{Dependency grammar} is different from constituency grammars like CFG or CCG, which build sentence tree by applying rewrite rules to constitute high level phrases from low level syntactic categories and lexems. It also defines sentence structure as a graph, but without phrasal nodes like \code{NP} or \code{VP}. Instead each node represent one word which points to it dependent. Since such representation do not rely on established phrase word order it is well suited for the analysis of languages with free word order, such as Ukrainian.
-
-
 
 In Fig \ref{fig:dependency_graph} sentence \textquote{nice dogs like cats} parsed to dependency graph. It consists of following dependencies: 
 
@@ -150,8 +148,6 @@ case = case marker
 \end{figure}
 
 The task of language modeling requires the transformation of words and documents into vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches would require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
-
-
 
 Methods of \emph{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing to the same point as vector ‘aunt’ (see Fig \ref{fig:word_embeddings} for example).
 
@@ -179,7 +175,7 @@ i^{(t)}=\sigma(W_i\cdot[h^{(t-1)}, x^{(t)}]+b_i)
 \label{fig:word_embeddings}
 \end{figure}
 
-New memory state ($\circ$ denotes entrywise product):
+New memory state:
 \begin{equation}
 \begin{gathered}
 \widetilde{C}^{(t)} = tanh(W_c\cdot[h^{(t-1)}, x^{(t)}]+b_C) \\
@@ -208,7 +204,7 @@ Theoretically, a sufficiently large encoder-decoder model should be able to perf
 This problem can be solved with attention technique. Its basic idea is to replace single vector representation of input sentence with references to representations of different words in it. On the encoding step, each word representation $h_e(t)$ is stored as a column of matrix $H_e$. During the decoding step, hidden state of decoder network is calculated as follows:
 
 \begin{equation}
-h_d(t) = enc([embed(w(t));c(t-1)], h_d(t-1))
+h_d^{(t)} = enc([embed(w^{(t)});c^{(t-1)}], h_d^{(t-1)})
 \label{attn:hd}
 \end{equation}
 
@@ -222,29 +218,29 @@ h_d(t) = enc([embed(w(t));c(t-1)], h_d(t-1))
 
 Elements of attention vector are calculated with arbitrary attention score function (for example, vector product) for each pair of decoder and encoder representations:
 \begin{equation}
-\alpha_j(t) = attnscore(h_e(j), h_d(t))
+\alpha_j^{(t)} = attnscore(h_e^{(j)}, h_d^{(t)})
 \label{attn:alpha}
 \end{equation}
 
 \begin{equation}
-\alpha_j(t) = softmax(\alpha_j(t))
+\alpha_j^{(t)} = softmax(\alpha_j^{(t)})
 \label{attn:alpha2}
 \end{equation}
 
 Then context vector is calculated as a weighted sum of encoder representations:
 \begin{equation}
-	c(t) = H_e\cdot\alpha(t)
+	c^{(t)} = H_e\cdot\alpha^{(t)}
 	\label{attn:c}
 \end{equation}
 
 \begin{equation}
-	P(t) = softmax(W_{hs}\cdot[h_d(t);c(t)])
+	P^{(t)} = softmax(W_{hs}\cdot[h_d^{(t)};c^{(t)}])
 \label{attn:P}
 \end{equation}
 
 This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
 
-\section{Recursive neural networks}
+\section{Recursive neural networks} \label{sec:rvnn}
 
 % reflects domain knowledge
 The architecture of recurrent neural network contains inductive bias about conditional probability of target variable with previous values in a sequence. Representation of natural language can also be modeled as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language meaning representation.
@@ -260,9 +256,9 @@ The architecture of recurrent neural network contains inductive bias about condi
 Topological structures with variable length could be modeled by neural networks recursively applying the same set of weights to each node. To model syntactic tree, each word is represented by corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of sentence \textquote{good dog like cats} could be modeled i the following way:
 \begin{equation}
 \begin{split}
-v_{NP} = f(W\cdot[v_{good}, v_{dog}])\\
-v_{VP} = f(W\cdot[v_{like}, v_{cats}])\\
-v_S = f(W\cdot[v_{NP}, v_{VP}])
+h_{NP} = f(W\cdot[w_{good}, w_{dog}] + b)\\
+h_{VP} = f(W\cdot[w_{like}, w_{cats}] + b)\\
+h_S = f(W\cdot[h_{NP}, h_{VP}] + b)
 \label{rvnn:example}
 \end{split}
 \end{equation}
@@ -276,9 +272,9 @@ Let's denote $H_{encoder}$ as a matrix of encoder output vectors and $h_{decoder
 \begin{equation}
     \begin{gathered}
     
-    H_{enc.pointer} = H_{encoder} \cdot W_{encoder}\\
+    H_{e.pointer} = H_e \cdot W_{e}\\
     
-    h_{dec.pointer} = h_{decoder}^{(t)} \cdot W_{decoder}\\
+    h_{dec.pointer} = h_{d}^{(t)} \cdot W_{d}\\
     
     H_{pointer} = tanh(H_{enc.pointer} + h_{dec.pointer})\\
     
