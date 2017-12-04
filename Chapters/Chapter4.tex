@@ -1,4 +1,4 @@
-\chapter{Model architecture} 
+\chapter{Model} 
 \label{Chapter4}
 
 \section{Code generation problem}
@@ -107,47 +107,43 @@ Vocabulary of predefined token values can be inferred from the dataset. However,
 Probabilities in Eq. \ref{eqn:tree_probability} estimated by neural attentional encoder-decoder model. Both encoder and decoder informational flow is structured by syntactic trees. 
 
 \subsection{Encoder}
-Input NL description $x$ consist of two parts. First is a sequence of word vectors $\{w^(i)\}^n_{i=1}$. Second is a description tree $T$ which consists of $m$ nodes $\{T_k\}^m_{k=1}$, where $m\geq n$. Details about the description tree parsing can be found in section \ref{preprocessing}. For all $k \leq n$, each tree node $T_k$ have a corresponding input vector from word sequences $w_k$. For $k > n$, input vector for $T_k$ is padding-vector. Each tree node $T_k$ have set of children nodes $ch(T_k)={T_a, T_b,...,T_d}$. Therefore a single input element $x_k$ can be defined as a tuple $(T_k, w_k, ch(T_k))$:
+Input NL description $x$ consist of two parts. First is a sequence of word vectors $\{w^{(t)}\}^n_{t=1}$. Second is a description tree which consists of $m$ nodes $\{\eta^{(t)}\}^m_{t=1}$, where $m\geq n$. Details about the description tree parsing can be found in section \ref{preprocessing}. For all $t \leq n$, each tree node $\eta^{(t)}$ have a corresponding input vector from word sequences $w^{(t)}$. For $t > n$, input vector for $\eta^{(t)}$ is padding-vector. Each tree node $\eta^{(t)}$ have set of children nodes $ch(\eta^{(t)})=\{\eta_{i}\}^k_{i=1}$. Therefore a single input element $x^{(t)}$ can be defined as a tuple $(\eta^{(t)}, w^{(t)}, ch(\eta^{(t)}))$:
 
 \begin{equation}
- x_k =
+ x^{(t)} =
   \begin{cases}
-    (T_k, w_k, ch(T_k))       & \quad \text{if } k\leq n\\
-    (T_k, w_{pad}, ch(T_k))  & \quad \text{if } k > n
+    (\eta^{(t)}, w^{(t)}, ch(\eta^{(t)}))  & \quad \text{if } t\leq n\\
+    (\eta^{(t)}, w_{pad}, ch(\eta^{(t)}))  & \quad \text{if } t > n
   \end{cases}
 \label{eq:enc_input}
 \end{equation}
 
-To encode this structures we used Tree-LSTM from \cite{Tai2015}\footnote{Used pytorch implementation from \href{https://github.com/dasguptar/treelstm.pytorch}}. Similary to SRvN, described in section \ref{sec:rvnn}, this model starts from the tree leaves, and recursively computes node embedding $h_k$ for each $x_k$ using values of memory cell $\{c_i\}^{n}_{i=1} = memory(ch(T_k))$ and values of previous node embeddings $\{h_i\}^{n}_{i=1} = hidden(ch(T_k))$:
+To encode this structures we used Tree-LSTM from \cite{Tai2015}\footnote{Used pytorch implementation from \href{https://github.com/dasguptar/treelstm.pytorch}{https://github.com/dasguptar/treelstm.pytorch}}. Similary to SRvN, described in section \ref{sec:rvnn}, this model starts from tree leaves, and recursively computes node embedding $h^{(t)}$ for each $x^{(t)}$ using values of memory cell $\{c_i\}^{k}_{i=1} = memory(ch(\eta^{(t)}))$ and previous  embeddings $\{h_i\}^{k}_{i=1} = hidden(ch(\eta^{(t)}))$ from children nodes:
 
 \begin{equation}
 \begin{gathered}
-    \hat{h_k} = \sum^{n}_{i=1}h_i \\
+    \hat{h} = \sum^{k}_{i=1}h_i \\
     
-    i_k = \sigma(W_i\cdot[\hat{h_k}, w_k]+b_i) \\
-    o_k = \sigma(W_o\cdot[\hat{h_k}, w_k]+b_o) \\
-    u_k = tanh(W_u\cdot[\hat{h_k}, w_k]+b_u) \\
+    i^{(t)} = \sigma(W_i\cdot[\hat{h}, w^{(t)}]+b_i) \\
     
+    u^{(t)} = tanh(W_u\cdot[\hat{h}, w^{(t)}]+b_u) \\
+    
+    f^{(t)}_i = \sigma(W_{f}\cdot [h_i, w^{(t)}] + b_f) \\
+    
+    c^{(t)} = i^{(t)} \circ u^{(t)} + \sum_{i=1}^{k} f^{(t)}_i \circ c_i \\
+    
+    o^{(t)} = \sigma(W_o\cdot[\hat{h}, w^{(t)}]+b_o) \\
+    
+    h^{(t)} = o^{(t)} \circ tanh(c^{(t)})
+
 \end{gathered}
-\label{eq:tree_lstm1}
+\label{eq:tree_lstm}
 \end{equation}
 
-\begin{equation}
-\begin{gathered}
-    H = []
-    f_k = \sigma(W_{fh}\cdot H + W_{fx} \cdot w_k + b_f)
+\subsection{Decoder}
+The decoder is RNN which sequentially generates AST model as defined in Eq. \ref{eqn:tree_probability}. Each production action naturally grounds to a step in the decoder. This way, the sequence of production rules from Ls. \ref{code:ast_production} can be interpreted as unrolling RNN time steps with some additional connections from parent action steps.
 
-\end{gathered}
-\label{eq:tree_lstm2}
-\end{equation}
-
-% 
-% https://github.com/dasguptar/treelstm.pytorch
-% https://web.stanford.edu/~jurafsky/slp3/
-% https://nlp.stanford.edu/software/stanford-dependencies.shtml
-% Danqi Chen and Christopher D Manning. 2014. A Fast and Accurate Dependency Parser using Neural Networks. Proceedings of EMNLP 2014
-% Jonathan Berant, Andrew Chou, Roy Frostig, Percy Liang. Semantic Parsing on Freebase from Question-Answer Pairs. Empirical Methods in Natural Language Processing (EMNLP), 2013.
-% CCG - mark steedman
+We used implementation of decoder from \cite{Yin2017}. It is vanilla LSTM with additional connections which reflect the topological structure of the code syntax. 
 
 \section{Learning}
 Beam search.
