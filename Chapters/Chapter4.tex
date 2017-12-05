@@ -23,7 +23,7 @@ The output of decoder is abstract syntax tree which consist of terminal and non-
 Let's consider as example AST from Fig. \ref{fig:ast}. It generation consist of following actions:
 
 \begin{codelist}{AST production sequence.}
-\begin{verbatim}
+\begin{verbnobox}[\verbarg]
 ApplyRule[root => (stmt*)]
     ApplyRule[stmt => (Assign)]
         ApplyRule[Assign => (expr*{targets}), (expr{value})]
@@ -67,7 +67,7 @@ ApplyRule[Lambda => (arguments args), (expr body)]
                         ApplyRule[Num => (int{n})]
                             GetToken["1"]
                             GetToken["<eos>"]
-\end{verbatim}
+\end{verbnobox}
 \label{code:ast_production}
 \end{codelist}
 
@@ -82,10 +82,11 @@ For each time step $t$ model selects next action with maximal probability - \cod
 
 \subsection{ApplyRule actions}
 
-At any moment of generation tree contains single frontier node (for time step $t$ it is $n_{f_t}$). Action \code{ApplyRule} expand frontier node in depth-first, left-to-right traversal of the tree. Production rule $r$ expands $n_{f_t}$ by appending all child nodes specified by the selected production. For example, in Ls. \ref{code:ast_production} rule for node \code{Call} extends this node with three new nodes: \code{expr{func}}, \code{expr*{args}}, \code{keyword*{keywords})}. 
+At any moment of generation tree contains single frontier node (for time step $t$ it is $n_{f_t}$). Action \code{ApplyRule} expand frontier node in depth-first, left-to-right traversal of the tree. Production rule $r$ expands $n_{f_t}$ by appending all child nodes specified by the selected production. For example, in Ls.\ref{code:ast_production} in step 10 rule for node \code{Call} extends this node with three new nodes: \code{expr\{func\}}, \code{expr*\{args\}}, \code{keyword*\{keywords\})}. 
 When $n_{f_t}$ is a terminal node, which can not be expanded further, the next action must be \code{GenToken}
 
-\textbf{Unary closures}. Sometimes, generating an AST requires applying a chain of unary productions. For example, in \ref{code:ast_production} it takes three time step to generate target for \code{Assign} statement:
+\textbf{Unary closures}. Sometimes, generating an AST requires applying a chain of unary productions. For example, in Ls. \ref{code:ast_production} in steps 4-6 it takes three time step to generate target for \code{Assign} statement:
+
 \begin{verbatim}
 ApplyRule[expr* => (expr)]
     ApplyRule[expr => (Name)]
@@ -143,7 +144,30 @@ To encode this structures we used Tree-LSTM from \cite{Tai2015}\footnote{Used py
 \subsection{Decoder}
 The decoder is RNN which sequentially generates AST model as defined in Eq. \ref{eqn:tree_probability}. Each production action naturally grounds to a step in the decoder. This way, the sequence of production rules from Ls. \ref{code:ast_production} can be interpreted as unrolling RNN time steps with some additional connections from parent action steps.
 
-We used implementation of decoder from \cite{Yin2017}. It is vanilla LSTM with additional connections which reflect the topological structure of the code syntax. 
+We used implementation of decoder from \cite{Yin2017}. It is vanilla LSTM with additional connections which reflect the topological structure of the code syntax. For each decoding step input vector is concatenation of frontier node embedding $n^{(t)}$, previous action embedding $a^{(t-1)}$ and parent feeding $p^{(t)}$. Parent feeding is a concatenation of decoder hidden state from parent step $h_{dp}^({t})$ and parent rule embedding $r_p^({t})$. Consider as example step 9 in Ls.\ref{code:ast_production}: 
+    
+\begin{verbatim}
+ApplyRule[Assign => (expr*{targets}), (expr{value})]
+    ...............
+                GetToken["<eos>"]
+    ApplyRule[expr => (Call)]
+\end{verbatim}
+
+It has frontier node \code{expr}, previous action \code{GetToken["<eos>"]} and parent rule \code{Assign => (expr*\{targets\}), (expr\{value\})}. Corresponding vectors for node, rule and token stored as column vector in matrices $W_n$, $W_r$, $W_t$.
+
+Additionally decoder input contains attention and attention over history context vectors. Context vectors calculated as described in section \ref{attention}. Attention over history creates context vector from previous decoder output:
+
+\begin{equation}
+    \phi_h^{(t-1)} = H_d\cdot\alpha_h^{(t-1)}
+\end{equation}
+
+Given all described above input values and previous decoder embedding $h_d^{(t-1)}$, next decoding step is calculated as following:
+
+\begin{equation}
+    h_d^{(t)}=lstm([a^{(t-1)}, n^{(t)}, p^{(t)}, \phi^{(t-1)}, \phi_h^{(t-1)}], h_d^{(t-1)})
+\end{equation}
+
+
 
 \section{Learning}
 Beam search.

@@ -43,7 +43,8 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{listings}
 \usepackage{amssymb}
 \usepackage{hyperref}
-
+\usepackage{verbatimbox}
+\def\verbarg{{\scriptsize\makebox[2ex]{\arabic{VerbboxLineNo}}}\hspace{2ex}}
 \usepackage{mathpazo} % Use the Palatino font by default
 
 \usepackage[backend=bibtex,style=authoryear-comp, natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
@@ -241,11 +242,13 @@ PyTorch team
 
 $\cdot$ & matrix multiplication \\
 $\circ$ & entrywise multiplication \\
+$[x1, x2]$ & concatenation of vectors $x1$ and $x2$ \\
 \addlinespace 
 $p(y|x)$ & probability of $y$ given $x$ \\
 $\tau$ & abstract syntax tree \\
 $\eta$ & node in natural language syntax tree \\
 \addlinespace
+$x^{(t)}$ & LSTM input vector for sequence step $t$ \\
 $h^{(t)}$ & LSTM hidden state vector for sequence step $t$ \\
 $c^{(t)}$ & LSTM memory cell vector for sequence step $t$ \\
 $f^{(t)}$ & LSTM forget gate vector for sequence step $t$ \\
@@ -254,15 +257,17 @@ $u^{(t)}$ & LSTM memory cell input vector for sequence step $t$ \\
 $o^{(t)}$ & LSTM output gate vector for sequence step $t$ \\
 
 $h_e^{(t)}$ & encoder embedding vector for encoding step $t$ \\
-$H_e^$ & encoder embeddings matrix \\
+$H_e^$ & matrix of encoder embeddings \\
 $h_d^{(t)}$ & decoder embedding vector for decoding step $t$ \\
+$H_d^$ & matrix of decoder embeddings \\
 $\alpha^{(t)}$ & Attention vector for decoding step $t$  \\
+$\phi^{(t)}$ & Context vector for decoding step $t$ \\
 
 $w$ & word embedding vector \\
 $W$ & linear transformation weights \\
 $b$ & linear transformation bias \\
 
-$embed$ & word embedding operation  \\
+$lstm$ & Long Short-Term Memory single step \\
 $softmax & normalized exponential function \\
 $relu$ & rectifier function \\
 $tanh$ & hyperbolic tangent \\
