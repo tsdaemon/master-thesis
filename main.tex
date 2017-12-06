@@ -221,6 +221,7 @@ PyTorch team
 \textbf{LSTM} & \textbf{L}ong \textbf{S}hort-\textbf{T}erm \textbf{M}emory\\
 \textbf{NMT} & \textbf{N}eural \textbf{M}achine \textbf{T}ranslation\\
 \textbf{NL} & \textbf{N}atural \textbf{L}anguage\\
+\textbf{OOV} & \textbf{O}ut \textbf{O}f \textbf{V}ocabulary\\
 \textbf{PBG}  & \textbf{P}hrase \textbf{B}ased \textbf{G}rammar \\
 \textbf{PCFG}  & \textbf{P}robabilistic \textbf{C}ontext-\textbf{F}ree \textbf{G}rammar\\
 \textbf{ReLU}  & \textbf{R}ectified \textbf{L}inear \textbf{U}nit\\
@@ -245,6 +246,7 @@ $\circ$ & entrywise multiplication \\
 $[x1, x2]$ & concatenation of vectors $x1$ and $x2$ \\
 \addlinespace 
 $p(y|x)$ & probability of $y$ given $x$ \\
+$P$ & vector of probabilities \\
 $\tau$ & abstract syntax tree \\
 $\eta$ & node in natural language syntax tree \\
 \addlinespace
@@ -255,21 +257,26 @@ $f^{(t)}$ & LSTM forget gate vector for sequence step $t$ \\
 $i^{(t)}$ & LSTM input gate vector for sequence step $t$ \\
 $u^{(t)}$ & LSTM memory cell input vector for sequence step $t$ \\
 $o^{(t)}$ & LSTM output gate vector for sequence step $t$ \\
-
+\addlinespace
 $h_e^{(t)}$ & encoder embedding vector for encoding step $t$ \\
 $H_e^$ & matrix of encoder embeddings \\
 $h_d^{(t)}$ & decoder embedding vector for decoding step $t$ \\
 $H_d^$ & matrix of decoder embeddings \\
-$\alpha^{(t)}$ & Attention vector for decoding step $t$  \\
-$\phi^{(t)}$ & Context vector for decoding step $t$ \\
-
+$\alpha^{(t)}$ & attention vector for decoding step $t$  \\
+$\phi^{(t)}$ & context vector for decoding step $t$ \\
+\addlinespace
+$a^{(t)}$ & AST generation action for step $t$ \\
+$r^{(t)}$ & AST production rule for step $t$ \\
+$v^{(t)}$ & AST terminal token for step $t$ \\
+$e(v)$ & one hot encoding for vocabulary item $v$ \\
+\addlinespace
 $w$ & word embedding vector \\
 $W$ & linear transformation weights \\
 $b$ & linear transformation bias \\
-
-$lstm$ & Long Short-Term Memory single step \\
-$softmax & normalized exponential function \\
-$relu$ & rectifier function \\
+\addlinespace
+$f_{pointer}$ & pointer network function \\
+$f_{lstm}$ & Long Short-Term Memory single step \\
+$softmax$ & normalized exponential function \\
 $tanh$ & hyperbolic tangent \\
 \addlinespace 
 

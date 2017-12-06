@@ -2,9 +2,9 @@
 \label{Chapter4}
 
 \section{Code generation problem}
-Given a natural language description $x$ our task is to infer the Python code $y$ based on the intent of the $x$. This task is solved by a generation of an underlying abstract syntax tree $\tau$. $\tau$ can be deterministically converted to a Python code $y$, though in this work source code $y$ and its abstract syntax tree are considered equivalent. A probabilistic grammar model of generating an abstract syntax tree $\tau$ given description $x$ is defined as $P(\tau|x)$. The best corresponding syntax tree $\tau$ is defined as
+Given a natural language description $x$ our task is to infer the Python code $y$ based on the intent of the $x$. Python code $y$ can be deterministically converted to an AST $\tau$ and vice-versa, though in this work source code $y$ and its abstract syntax tree are considered equivalent. A probabilistic grammar model of generating an abstract syntax tree $\tau$ given description $x$ is defined as $P(\tau|x)$. The best corresponding syntax tree $\tau$ is defined as
 \begin{equation}
-\hat{\tau}=\underset{\tau}{\operatorname{argmax}} p(\tau|x)
+\hat{\tau}=\underset{\tau}{\operatorname{argmax}}\: p(\tau|x)
 \label{eqn:main_problem}
 \end{equation}
 Probability from Eq. \ref{eqn:main_problem} is modeled with neural model with set of weights $\theta$. To learn values of $\theta$ we used set of training examples, which consist of tuples $(\tau^{(x)}, x)$. The parameters of the model are learned by maximizing the conditional log-probabilities for the training set:
@@ -73,17 +73,17 @@ ApplyRule[Lambda => (arguments args), (expr body)]
 
 Under this grammar model, the probability of generating an AST $\tau$ is factorized as:
 \begin{equation}
-p(\tau|x) = \prod{N}{n=1} p(a_n|x, a_{<n})
+p(\tau|x) = \prod^{n}_{t=1} p(a^{(t)}|x, a^{(<t)})
 \label{eqn:tree_probability}
 \end{equation}
-where $a_t$ is the action taken at the time step $t$ and $a_{<t}$ is the sequence of actions before $t$. 
+where $a^{t}$ is an action taken at the time step $t$ and $a_{<t}$ is the sequence of actions before $t$. 
 
 For each time step $t$ model selects next action with maximal probability - \code{ApplyRule} to grow the tree or \code{GenToken} to fill values in terminal nodes. 
 
 \subsection{ApplyRule actions}
 
-At any moment of generation tree contains single frontier node (for time step $t$ it is $n_{f_t}$). Action \code{ApplyRule} expand frontier node in depth-first, left-to-right traversal of the tree. Production rule $r$ expands $n_{f_t}$ by appending all child nodes specified by the selected production. For example, in Ls.\ref{code:ast_production} in step 10 rule for node \code{Call} extends this node with three new nodes: \code{expr\{func\}}, \code{expr*\{args\}}, \code{keyword*\{keywords\})}. 
-When $n_{f_t}$ is a terminal node, which can not be expanded further, the next action must be \code{GenToken}
+At any generation moment tree $\tau$ contains single frontier node (for time step $t$ it is $n_{f_t}$). Action \code{ApplyRule} expand frontier node in depth-first, left-to-right traversal of the tree. Production rule $r$ expands $n_{f_t}$ by appending all child nodes specified by the selected production. For example, in Ls.\ref{code:ast_production} in step 10 rule for node \code{Call} extends this node with three new nodes: \code{expr\{func\}}, \code{expr*\{args\}}, \code{keyword*\{keywords\})}. 
+When $n_{f_t}$ is a terminal node, which can not be expanded further, the next action must be \code{GenToken}.
 
 \textbf{Unary closures}. Sometimes, generating an AST requires applying a chain of unary productions. For example, in Ls. \ref{code:ast_production} in steps 4-6 it takes three time step to generate target for \code{Assign} statement:
 
@@ -99,16 +99,16 @@ ApplyRule[expr* => (str{id})]
 
 We tested our model both with and without unary closures.
 
-\subsection{GenToken actions}
-If tree reached leaf and $n_{f_t}$ is terminal node, the \code{GenToken} actions used to fill this node. Each token generation ends with special end-of-string token \code{"<eos>"}. This way complex tokens like function name \code{sortBySecondIndex} can be split on parts, thus reduce token vocabulary and allow complex rare token to be constructed from its constituents. After the end-of-string token generation model proceeds to the next frontier node.
+\subsection{GenToken actions} \label{gentoken}
+If tree reached leaf and $n_{f_t}$ is terminal node, the \code{GenToken} actions used to fill this node. Each token generation ends with special end-of-string token \code{"<eos>"}. This way complex tokens like function name \code{sortBySecondIndex} can be split on parts \code{['sort', 'By', 'Second', 'Index']}, thus reduce token vocabulary and allow complex rare token to be constructed from its constituents. After the end-of-string token generation model proceeds to the next frontier node.
 
 Vocabulary of predefined token values can be inferred from the dataset. However, it is clear that this vocabulary will not cover all possible token for any environment. To cope with this problem, values can be copied directly from the input sequence. Therefore, it allows model to use literals and names from the code description.
 
 \section{Action probabilities}
-Probabilities in Eq. \ref{eqn:tree_probability} estimated by neural attentional encoder-decoder model. Both encoder and decoder informational flow is structured by syntactic trees. 
+Probabilities in Eq. \ref{eqn:tree_probability} estimated by a neural attentional encoder-decoder model. Both encoder and decoder informational flow is structured by syntactic trees. 
 
 \subsection{Encoder}
-Input NL description $x$ consist of two parts. First is a sequence of word vectors $\{w^{(t)}\}^n_{t=1}$. Second is a description tree which consists of $m$ nodes $\{\eta^{(t)}\}^m_{t=1}$, where $m\geq n$. Details about the description tree parsing can be found in section \ref{preprocessing}. For all $t \leq n$, each tree node $\eta^{(t)}$ have a corresponding input vector from word sequences $w^{(t)}$. For $t > n$, input vector for $\eta^{(t)}$ is padding-vector. Each tree node $\eta^{(t)}$ have set of children nodes $ch(\eta^{(t)})=\{\eta_{i}\}^k_{i=1}$. Therefore a single input element $x^{(t)}$ can be defined as a tuple $(\eta^{(t)}, w^{(t)}, ch(\eta^{(t)}))$:
+Input NL description $x$ consist of two parts. First is a sequence of length $n$ of word vectors $\{w^{(t)}\}^n_{t=1}$. Second is a description tree which consists of $m$ nodes $\{\eta^{(t)}\}^m_{t=1}$, where $m\geq n$. Details about the description tree parsing can be found in section \ref{preprocessing}. For all $t \leq n$, each tree node $\eta^{(t)}$ have a corresponding input vector from word sequences $w^{(t)}$. For $t > n$, input vector for $\eta^{(t)}$ is padding-vector. Each tree node $\eta^{(t)}$ have set of children nodes $ch(\eta^{(t)})=\{\eta_{i}\}^k_{i=1}$. Therefore a single input element $x^{(t)}$ can be defined as a tuple $(\eta^{(t)}, w^{(t)}, ch(\eta^{(t)}))$:
 
 \begin{equation}
  x^{(t)} =
@@ -142,9 +142,9 @@ To encode this structures we used Tree-LSTM from \cite{Tai2015}\footnote{Used py
 \end{equation}
 
 \subsection{Decoder}
-The decoder is RNN which sequentially generates AST model as defined in Eq. \ref{eqn:tree_probability}. Each production action naturally grounds to a step in the decoder. This way, the sequence of production rules from Ls. \ref{code:ast_production} can be interpreted as unrolling RNN time steps with some additional connections from parent action steps.
+The decoder is RNN which sequentially generates an AST model as defined in Eq. \ref{eqn:tree_probability}. Each production action naturally grounds to a step in the decoder. This way, the sequence of production rules from Ls. \ref{code:ast_production} can be interpreted as unrolling RNN time steps with some additional connections from parent action steps.
 
-We used implementation of decoder from \cite{Yin2017}. It is vanilla LSTM with additional connections which reflect the topological structure of the code syntax. For each decoding step input vector is concatenation of frontier node embedding $n^{(t)}$, previous action embedding $a^{(t-1)}$ and parent feeding $p^{(t)}$. Parent feeding is a concatenation of decoder hidden state from parent step $h_{dp}^({t})$ and parent rule embedding $r_p^({t})$. Consider as example step 9 in Ls.\ref{code:ast_production}: 
+We used implementation of decoder from \cite{Yin2017}. It is vanilla LSTM with additional connections which reflect the topological structure of the code syntax. For each decoding step, input vector is concatenation of frontier node embedding $n^{(t)}$, previous action embedding $a^{(t-1)}$ and parent feeding $p^{(t)}$. Parent feeding is a concatenation of decoder hidden state from parent step $h_{dp}^{(t)}$ and parent rule embedding $r_p^{(t)}$. Consider as example step 9 in Ls.\ref{code:ast_production}: 
     
 \begin{verbatim}
 ApplyRule[Assign => (expr*{targets}), (expr{value})]
@@ -153,21 +153,106 @@ ApplyRule[Assign => (expr*{targets}), (expr{value})]
     ApplyRule[expr => (Call)]
 \end{verbatim}
 
-It has frontier node \code{expr}, previous action \code{GetToken["<eos>"]} and parent rule \code{Assign => (expr*\{targets\}), (expr\{value\})}. Corresponding vectors for node, rule and token stored as column vector in matrices $W_n$, $W_r$, $W_t$.
+It has frontier node \code{expr}, previous action \code{GetToken["<eos>"]} and parent rule \code{Assign => (expr*\{targets\}), (expr\{value\})}. Corresponding vectors for node, rule and token stored as column vectors in matrices $W_n$, $W_r$, $W_v$.
 
-Additionally decoder input contains attention and attention over history context vectors. Context vectors calculated as described in section \ref{attention}. Attention over history creates context vector from previous decoder output:
+Additionally, decoder input contains attention and attention over history context vectors. Context vectors calculated as described in section \ref{attention}. Attention over history uses context vector from previous decoder output:
 
 \begin{equation}
-    \phi_h^{(t-1)} = H_d\cdot\alpha_h^{(t-1)}
+    \phi_h^{(t)} = H_d\cdot\alpha_h^{(t)}
 \end{equation}
 
 Given all described above input values and previous decoder embedding $h_d^{(t-1)}$, next decoding step is calculated as following:
 
 \begin{equation}
-    h_d^{(t)}=lstm([a^{(t-1)}, n^{(t)}, p^{(t)}, \phi^{(t-1)}, \phi_h^{(t-1)}], h_d^{(t-1)})
+    h_d^{(t)}=f_{lstm}([a^{(t-1)}, n^{(t)}, p^{(t)}, \phi^{(t-1)}, \phi_h^{(t-1)}], h_d^{(t-1)})
 \end{equation}
 
+\subsection{Calculating probabilities}
+In this section is explained how action probabilites from Eq. \ref{eqn:tree_probability} are calculated from decoder embeddings $h^{(t)}$.
+
+\textbf{ApplyRule}. The probability of applying a rule $r$ as the current action $a^{(t)}$ is given by a softmax:
+
+\begin{equation}
+\begin{gathered}
+    h^{(t)}_r = tanh(W _{r1}\cdot h^{(t)} + b_{r1}) \\
+    P_r = softmax(W_r\cdot h^{(t)}_r  + b_r) \\
+    p(a^{(t)} = ApplyRule[r]|x,a^{(<t)}) = P_r\cdot e(r)
+\end{gathered}
+\label{eqn:apply_rule}
+\end{equation}
+
+where $e(r)$ is one-hot embedding for rule $r$.
+
+\textbf{GenToken}. As described in section \ref{gentoken}, a token $v$ can be generated from a predefined vocabulary or copied from the input. Therefore probability of action to be $GenToken[v]$ defined as marginal probability:
+    
+\begin{equation}
+\begin{gathered}
+    p(a^{(t)} = GenToken[v]|x,a^{(<t)}) = p(gen|x, a^{(<t)}) p(v|gen, x, a^{(<t)}) + \\
+    p(copy|x, a^{(<t)}) p(v|copy, x, a^{(<t)})
+\end{gathered}
+\end{equation}
+
+\begin{equation}
+    p(gen|\cdot), p(copy|\cdot) = softmax(W_s\cdot h^{(t)} + b_s)
+\end{equation}
+
+Probability of selection of the token $v$ from the vocabulary calculated similary to Eq. \ref{eqn:apply_rule}. The difference is that the decoder embedding is concatenated with a context vector $\phi^{(t)}$:
+
+\begin{equation}
+\begin{gathered}
+    h^{(t)}_v = tanh(W _{v1}\cdot [h^{(t)}, \phi^{(t)}] + b_{v1}) \\
+    P_v = softmax(W_v\cdot h^{(t)}_v  + b_v) \\
+    p(v|gen, x, a^{(<t)}) = P_v\cdot e(v)
+\end{gathered}
+\label{eq:vocab_gen}
+\end{equation}
+
+To model the copy probability we used pointer network \parencite{Vinyals2015} described in section \ref{pointer}. The same as in Eq. \ref{eq:vocab_gen}, we used decoder embedding concatenated with the context vector:
+
+\begin{equation}
+\begin{gathered}
+    P_c = f_{pointer}(H_e, [h^{(t)}, \phi^{(t)}]) \\
+    p(v|copy, x, a^{(<t)}) = P_c \cdot e(v)
+\end{gathered}
+\end{equation}
+
+Usage of concatenated vector $[h^{(t)}, \phi^{(t)}]$ for token generation probability calculation is reasonable since tokens are likely to occur in the input sequence, thus context vector might store important information.
+
+\section{Training and Inference}
+
+\begin{table}
+\centering
+\begin{tabular}{ l l l }
+\hline
+\textbf{Dataset} & \textbf{HS} & \textbf{Django} \\
+\hline 
+Train & 533 & 16.000 \\ 
+Development & 66 & 1.000 \\ 
+Test & 66 & 1.805 \\ 
+\hline
+Avg. tokens in description & 39.1 & 14.3 \\
+Avg. characters in code & 360.3 & 41.1 \\
+Avg. size of AST (\# nodes) & 136.6 & 17.2 \\
+ \hline
+ \hline
+\multicolumn{3}{c}{Statistics of Grammar} \\
+terminal vocabulary size & 1361 & 6733 \\ 
+\hline
+\multicolumn{3}{l}{\textbf{w/o unary closures}} \\
+\# productions & 100 & 222 \\
+\# node types & 61 & 96 \\
+Avg. \# of actions per example & 173.4 & 20.3 \\ 
+\hline
+\multicolumn{3}{l}{\textbf{w/ unary closures}} \\
+\# productions & 100 & 237 \\
+\# node types & 57 & 92 \\
+Avg. \# of actions per example & 141.7 & 16.4 \\ 
+\hline
+\end{tabular}
+\caption{Statistics of datasets and associated grammars}
+\end{table}
+
+Values for all weights and biases was inferred from training examples, as described in Eq. \ref{eqn:mle}. Each AST $\tau$ from training examples was transformed into sequence of oracle actions. The next decoder input selected from oracle sequence (teacher forcing, section \ref{seq2seq}). The model is  optimized by maximizing the log-likelihood of the oracle actions sequence. Optimization was performed by the method of error backpropagation with Adam \parencite{Kingma2014} algorigthm. At inference time, given an NL description, we use beam search, described in section \ref{beam} to approximate the best AST $\hat{y}$ in Eq. \ref{eqn:main_problem}.
 
 
-\section{Learning}
-Beam search.
+

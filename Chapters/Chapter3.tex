@@ -17,6 +17,7 @@ The \emph{abstract syntax tree} is a tree representation of an abstract structur
 The Python \emph{abstract grammar} contains a set of production rules, composed of head node and multiple child nodes. For example, in Fig \ref{fig:ast} the first rule is used to generate the assignment of statement result to variable. It consists of the head node of type \code{Assign} and two child nodes of types \code{Name} and \code{Call}, respectively. Non-terminal nodes (the blue ones) defines the general structure of the target code, while terminal nodes (the green ones) refer to symbol tokens, like variables, constants or operations. Full Python 3.6 abstract grammar can be found in Appendix \ref{AppendixA}. 
 
 \section{Semantic parsing}
+\subsection{Constituency parsing}
 Theory of sentence analysis is derived from the idea that the words of a sentence seem to combine into patterns and structures. Each word is classified as a different in terms of its function in a sentence. According to this function, to each word there can be assigned its lexical category or part of speech, like a noun (\code{N}), adjective (\code{A}), or verb (\code{V}). 
 
 This system could be extended to the level of syntactic categories, combining words or other syntactic categories with similar function into phrases. Each phrase is characterized by the properties of the headword that it includes. For example, the headword of the subject of a sentence is a noun, so it is classified as a noun phrase (\code{NP}). A verb is regarded as the head of the sentence predicate, so predicate is classified as a verb phrase (\code{VP}). Rules which describe how lexical categories can be combined into syntactic categories is called \emph{rewriting rules}. For example, a noun phrase category may be described as the parent of adjective and noun categories, and it may be represented by a rule of the following form:
@@ -59,7 +60,7 @@ Phrase-based grammar might also be refered as \emph{context-free grammar}, beaus
 \label{fig:syntax_tree}
 \end{figure}
 
-\section{Combinatory-categorial grammar}
+\subsection{Combinatory-categorial grammar}
 Phrase-structure grammars analyze the sentence recursively applying rewriting rules, starting from identification of the parts of speech or lexical categories of individual words. This rule governs how words can be combined into phrases and sentences. Compared with phrase-structure grammars, \emph{combinatory-categorial grammars} do not contain a separate collection of category-combining rules. Lexical categories of words such as adjectives and nouns describe the functions that determine how these words can combine with other categories. Each node in CCG tree can be translated into lambda calculus, thus CCG is a transparent interface between syntax and semantics of a sentence.
 
 Consider an example. Adjective \textquote{good} is in a category corresponding to a function that maps from the nouns into the noun phrases. The association of this item with a function looks like that:
@@ -115,7 +116,7 @@ $\lambda y.like(y, CATS)$
 
 $\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
 
-\section{Dependency parsing}
+\subsection{Dependency parsing}
 
 \begin{figure}[h]
 \centering
@@ -197,24 +198,32 @@ h^{(t)}=o^{(t)}\circ tanh(C^{(t)})
 
 LSTM step can be presented as function:
 \begin{equation}
-h^{(t)}, c^{(t)} = lstm(x^{(t)}, h^{(t-1)}, c^{(t-1)})
+h^{(t)}, c^{(t)} = f_{lstm}(x^{(t)}, h^{(t-1)}, c^{(t-1)})
 \end{equation}
 
 Value of memory cell often is not used in further calculations and thus can be omitted:
 \begin{equation}
-h^{(t)} = lstm(x^{(t)}, h^{(t-1)})
+h^{(t)} = f_{lstm}(x^{(t)}, h^{(t-1)})
 \end{equation}
 
-\section{Sequence-to-sequence machine translation with attention} \label{attention}
+\section{Sequence-to-sequence machine translation} \label{seq2seq}
 % http://phontron.com/class/mtandseq2seq2017/mt-spring2017.chapter8.pdf
-The task of machine translation can be formalized as mapping of a sequence of words in a source language to a sequence of words in a target language. This task can be solved with an \emph{encoder-decoder} model, which consists of two RNNs. The first RNN consumes input sequence step by step and encodes it into so-called thought vector. After encoding, the second RNN uses thought vector as its initial hidden state and decodes output sentence word by word.  Each word from decoder output is used as input for the next decoding step until the model outputs the end-of-sentence token. 
+The task of machine translation can be formalized as mapping of a sequence of words in a source language to a sequence of words in a target language \parencite{Neubig2017}. This task can be solved with an \emph{encoder-decoder} model, which consists of two RNNs. The first RNN consumes input sequence step by step and encodes it into so-called thought vector. After encoding, the second RNN uses thought vector as its initial hidden state and decodes output sentence word by word.  Each word from decoder output is used as input for the next decoding step until the model outputs the end-of-sentence token. 
 
+During training, Seq2Seq model learn its parameters by maximizing the log-likelihood $P(y|x)$ of a target sequence $y$ given input sequence $x$. The next input of decoder can be selected in two ways:
+    \begin{itemize}
+    	\item \textbf{Without Teacher Forcing:} previous prediction used as the next input.
+    	\item \textbf{With Teacher Forcing:} target sequence values used as the next input.
+    \end{itemize}
+
+
+\subsection{Attention} \label{attention}
 Theoretically, a sufficiently large encoder-decoder model should be able to perform machine translation perfectly. However, to encode all words and dependencies between them in the arbitrary-length sentences the thought vector should have enormous length. It would require massive computational resources to train and use such architecture, and thus this approach is ineffective.
 
-This problem can be solved with attention technique. Its basic idea is to replace single vector representation of input sentence with references to representations of different words in it. On the encoding step, each word representation $h_e^{(t)}$ is stored as a column of matrix $H_e$. During the decoding step, each decoder input extended with context vector $\phi^{(t-1)}$:
+This problem can be solved with attention technique \parencite{Bahdanau2014}. Its basic idea is to replace single vector representation of input sentence with references to representations of different words in it. On the encoding step, each word representation $h_e^{(t)}$ is stored as a column of matrix $H_e$. During the decoding step, each decoder input extended with context vector $\phi^{(t-1)}$:
 
 \begin{equation}
-h_d^{(t)} = lstm([w^{(t)}, \phi^{(t-1)}], h_d^{(t-1)})
+h_d^{(t)} = lstm([w^{(t)}, \phi^{(t)}], h_d^{(t-1)})
 \label{attn:hd}
 \end{equation}
 
@@ -228,24 +237,33 @@ h_d^{(t)} = lstm([w^{(t)}, \phi^{(t-1)}], h_d^{(t-1)})
 
 Context vector $\phi^{(t)}$ is calculated as a weighted sum of encoder representations:
 \begin{equation}
-	\phi^{(t-1)} = H_e\cdot\alpha^{(t-1)}
+	\phi^{(t)} = H_e\cdot\alpha^{(t)}
 	\label{attn:phi}
 \end{equation}
 
 Weights for attention vector $\alpha^{(t-1)}$ can be calculated with arbitrary attention score function (for example, vector product) for each pair of decoder vector $h_d^{(t)}$ and encoder vector $h_e^{(i)}, \forall i \in 1..n$, where $n$ is a length of encoded sequence. In this work we used DNN with one hidden layer as suggested in work of \cite{Bahdanau2014}:
 \begin{equation}
 \begin{gathered}
-\hat{\alpha}_i^{(t-1)} = W_{attn1} \cdot [h_e^{(i)}, h_d^{(t-1)}] \\
-\alpha_i^{(t-1)} = W_{attn2} \cdot tanh(\hat{\alpha}_{i}^{(t-1)}) \\
-\alpha^{(t-1)} = softmax(\alpha^{(t-1)})
+\hat{\alpha}_i^{(t)} = W_{attn1} \cdot [h_e^{(i)}, h_d^{(t-1)}] \\
+\alpha_i^{(t)} = W_{attn2} \cdot tanh(\hat{\alpha}_{i}^{(t)}) \\
+\alpha^{(t)} = softmax(\alpha^{(t)})
 \end{gathered}
 \label{attn:alpha}
 \end{equation}
 
 This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
 
-\section{Recursive neural networks} \label{sec:rvnn}
+\subsection{Beam search} \label{beam}
+When the model learned the probability model on train examples, it can generate new translations. This can be done in several ways \parencite{Neubig2017}:
+        \begin{itemize}
+    	\item \textbf{Random Sampling:} For each time step $t$ randomly select an output words $w^{(t)}$ for $y$ from the probability distribution $P(y|x)$.
+    	\item \textbf{Gready Search:} Find the $y$ that maximizes $P(y|x)$, selecting each next word $w^{(i)}$ with maximum probability $\hat{w^{(t)}} = \underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$.
+    	\item \textbf{Beam Search:} Find the $n$ outputs with the highest probabilities according to $P(y|x)$.
+    \end{itemize}
 
+\emph{Beam search} is similar to greedy search, but instead of considering only the one best hypothesis $\underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$, its consider $b$ best hypotheses at each time step, where $b$ is the width of the beam. To find best hypotheses, beam search explores the generation graph in breadth-first manner. At each level of the search tree it calculates probability for each candidates from target space and then selects $b$ variants with the highest probability. This way it allows to generate sequences with higher cumulative probability, wchich could be dropped by the greedy search.
+
+\section{Recursive neural networks} \label{sec:rvnn}
 % reflects domain knowledge
 The architecture of recurrent neural network contains inductive bias about conditional probability of target variable with previous values in a sequence. Representation of natural language can also be modeled as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language meaning representation.
 
@@ -268,7 +286,7 @@ h_S = f(W\cdot[h_{NP}, h_{VP}] + b)
 \end{equation}
 where $f$ is any differentiable non-linearity like $tanh$ or $ReLU$. The example of semantic tree parsing with recursive network is presented in Fig \ref{fig:rvnn}.
 
-\section{Pointer networks}
+\section{Pointer networks} \label{pointer}
 Neural network operates with vector representations of words which selected from predefined vocabulary. This imposes the problem of unknown words which don't have vector representation. This is especially important for the translation task where both input and output sequences could contain rare, special words or names. However, names of people or locations should not be translated but copied to target sequence. \cite{Vinyals2015} proposed solution of this problem with \emph{pointer network}. For each decoding step it calculates the probability of next word to be copied from an input sequence. Calculation of this probability described below step-by-step.
 
 Let's denote $H_{encoder}$ as a matrix of encoder output vectors and $h_{decoder}^{(t)}$ - decoder output vector on decoding step $t$. First is calculated hidden state of pointer network:
@@ -298,6 +316,8 @@ Then each row from matrix $H_{pointer}$ is translated to one value and probabili
     \end{gathered}
 \end{equation}
 
-Vector $P$ contains probabilities values for each input sequence token to be copied into output sequence.
-
+Vector $P$ contains probability for each input sequence token to be copied into output sequence. In following explanations, pointer network function denoted $f_{pointer}$:
+\begin{equation}
+    P = f_{pointer}(H_e, h_d^{(t)})
+\end{equation}
 
