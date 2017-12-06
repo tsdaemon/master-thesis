@@ -12,7 +12,7 @@ All input descriptions was tokenized using NLTK\footnote{\href{http://www.nltk.o
 \textbf{Synthetic description:} & Name: Deadly Poison, attack: -1, defence: -1, cost: 1, duration: -1, type: Spell, player class: Rogue, race: None, rarity: Free. Give your weapon +2 Attack. \\
 \hline
 \end{tabularx}
-\caption{Synthetic description for the item \#3 from the developer split of \emph{HS}.}
+\caption[Synthetic description example]{Synthetic description for the item \#3 from the developer split of \emph{HS}.}
 \label{table:hs_input}
 \end{table}
 
@@ -49,7 +49,7 @@ Avg. \# of actions per example & 173.4 & 20.3 \\
 Avg. \# of actions per example & 141.7 & 16.4 \\ 
 \hline
 \end{tabular}
-\caption{Statistics of datasets and associated grammars \parencite{Yin2017}}
+\caption[Statistics of datasets]{Statistics of datasets and associated grammars \parencite{Yin2017}}
 \end{table}
 
 \section{Implementation details}
@@ -59,7 +59,7 @@ Avg. \# of actions per example & 141.7 & 16.4 \\
 \textbf{Model parameters.} The size of all embeddings is 256, except for word embeddings, which is 300. For word embeddings we used preptrained Common Crawl GloVe vectors \parencite{pennington2014}. We have not freeze weights of word embeddings, so  pretrained values can be additionaly adjusted during training. The dimensions of encoder and decoder hidden states and memory cells are 256. Hidden states of attention and pointer networks are of size 50. Also, we used last state of encoder as initial state of decoder (thought vector). For decoding we used beam size 10.
 
 % https://r2rt.com/non-zero-initial-states-for-recurrent-neural-networks.html
-\textbf{Regularization.} Since our datasets are relatively small for  a such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similary to approach described in work of \cite{zimmermann2012} we added Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. This methods added statistically significant improvement of both validation and test scores.
+\textbf{Regularization.} Since our datasets are relatively small for  a such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similary to approach described in work of \cite{zimmermann2012} we added Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. This methods added statistically significant improvement of both training speed and validation scores.
 
 \section{Evaluation metrics}
 BLEU

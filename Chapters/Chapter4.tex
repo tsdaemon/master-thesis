@@ -220,7 +220,7 @@ Usage of concatenated vector $[h^{(t)}, \phi^{(t)}]$ for token generation probab
 
 \section{Training and Inference}
 
-Values for all weights and biases was inferred from training examples, as described in Eq. \ref{eqn:mle}. Each AST $\tau$ from training examples was transformed into sequence of oracle actions. The next decoder input selected from oracle sequence (teacher forcing, section \ref{seq2seq}). The model is  optimized by maximizing the log-likelihood of the oracle actions sequence. Optimization was performed by the method of error backpropagation with Adam \parencite{Kingma2014} algorigthm. At inference time, given an NL description, we use beam search, described in section \ref{beam} to approximate the best AST $\hat{y}$ in Eq. \ref{eqn:main_problem}.
+Values for all weights and biases was inferred from training examples, as described in Eq. \ref{eqn:mle}. Each AST $\tau$ from training examples was transformed into sequence of oracle actions. The next decoder input selected from oracle sequence (teacher forcing, section \ref{seq2seq}). The model is optimized by maximizing the log-likelihood of the oracle actions sequence. Optimization was performed by the method of error backpropagation with Adam \parencite{Kingma2014} algorigthm. At inference time, given an NL description, we use beam search, described in section \ref{beam} to approximate the best AST $\hat{y}$ in Eq. \ref{eqn:main_problem}.
 
 
 
