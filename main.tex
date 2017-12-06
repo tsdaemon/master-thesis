@@ -47,6 +47,9 @@ headsepline, % Uncomment to get a line under the header
 \def\verbarg{{\scriptsize\makebox[2ex]{\arabic{VerbboxLineNo}}}\hspace{2ex}}
 \usepackage{mathpazo} % Use the Palatino font by default
 
+% https://tex.stackexchange.com/questions/166743/automatic-line-break-in-tabular
+\usepackage{tabularx} % tables with line-breaks
+
 \usepackage[backend=bibtex,style=authoryear-comp, natbib=true]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
 
 \addbibresource{./main.bib} % The filename of the bibliography
@@ -191,6 +194,8 @@ Software development requires vast knowledge about different programming tools w
 I would like to thank Vsevolod Dyomkin and Rostyslav Hryniv who supervised my research and directed me during thesis writing. Also, I am grateful to Ukrainian Catholic University and Oleksii  Molchanovskyi personally who created the first computer science master program in Ukraine. 
 
 Arvilab
+
+Artem Chernodub
 
 Yin & Neubig
 

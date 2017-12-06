@@ -1,14 +1,65 @@
 \chapter{Experiments} \label{Chapter5} 
 
-
 \section{Datasets preprocessing} \label{preprocessing}
-% A* CCG Parsing with a Supertag and Dependency Factored Model
+
+All input descriptions was tokenized using NLTK\footnote{\href{http://www.nltk.org/}{http://www.nltk.org/}}. For \emph{HS} we also constructed synthetic description, using structured part of target class descriptions (Tab. \ref{table:hs_input}). Then all descriptions was parsed to trees with three different approaches, described below.
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{ l X }
+\hline
+\textbf{Structured input:} & Deadly Poison NAME\_END -1 ATK\_END -1 DEF\_END 1 COST\_END -1 DUR\_END Spell TYPE\_END Rogue PLAYER\_CLS\_END NIL RACE\_END Free RARITY\_END Give your weapon +2 Attack. \\
+\hline 
+\textbf{Synthetic description:} & Name: Deadly Poison, attack: -1, defence: -1, cost: 1, duration: -1, type: Spell, player class: Rogue, race: None, rarity: Free. Give your weapon +2 Attack. \\
+\hline
+\end{tabularx}
+\caption{Synthetic description for the item #3 from the developer split of \emph{HS}.}
+\label{table:hs_input}
+\end{table}
+
+To create CFG sentence representation we used \code{LexicalizedParser} \parencite{klein2003} from Stanford CoreNLP\footnote{\href{https://stanfordnlp.github.io/CoreNLP}{https://stanfordnlp.github.io/CoreNLP}} Java package. Dependency parsing was done by \code{DependencyParser} \parencite{chen2014} from the same CoreNLP package. For CCG parsing we used package EasyCCG\footnote{\href{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}} \parencite{lewis2014}.\footnote{We were not able to include figures with examples parse trees in the thesis due to their large size, but you can find them at our \href{https://github.com/tsdaemon/treelstm-code-generation/tree/master/pictures}{GitHub repo}}
+
 % https://nlp.stanford.edu/pubs/glove.pdf 
-% dependency parsing https://web.stanford.edu/~jurafsky/slp3/
-% https://nlp.stanford.edu/software/stanford-dependencies.shtml
-% CCG - mark steedman
-% Danqi Chen and Christopher D Manning. 2014. A Fast and Accurate Dependency Parser using Neural Networks. Proceedings of EMNLP 2014
-% Jonathan Berant, Andrew Chou, Roy Frostig, Percy Liang. Semantic Parsing on Freebase from Question-Answer Pairs. Empirical Methods in Natural Language Processing (EMNLP), 2013.
+
+\begin{table}
+\centering
+\begin{tabular}[h]{ l l l }
+\hline
+\textbf{Dataset} & \textbf{HS} & \textbf{Django} \\
+\hline 
+Train & 533 & 16.000 \\ 
+Development & 66 & 1.000 \\ 
+Test & 66 & 1.805 \\ 
+\hline
+Avg. tokens in description & 39.1 & 14.3 \\
+Avg. characters in code & 360.3 & 41.1 \\
+Avg. size of AST (\# nodes) & 136.6 & 17.2 \\
+ \hline
+ \hline
+\multicolumn{3}{c}{Statistics of Grammar} \\
+terminal vocabulary size & 1361 & 6733 \\ 
+\hline
+\multicolumn{3}{l}{\textbf{w/o unary closures}} \\
+\# productions & 100 & 222 \\
+\# node types & 61 & 96 \\
+Avg. \# of actions per example & 173.4 & 20.3 \\ 
+\hline
+\multicolumn{3}{l}{\textbf{w/ unary closures}} \\
+\# productions & 100 & 237 \\
+\# node types & 57 & 92 \\
+Avg. \# of actions per example & 141.7 & 16.4 \\ 
+\hline
+\end{tabular}
+\caption{Statistics of datasets and associated grammars \parencite{Yin2017}}
+\end{table}
+
+\section{Implementation details}
+
+\textbf{Dynamic computational graph.} Model of \cite{Yin2017} was build on framework Theano\footnote{\href{http://deeplearning.net/software/theano/}{http://deeplearning.net/software/theano/}}. But Theano is not able to build dynamic computational graph to encode syntactic trees. Therefore, we implemented our model on PyTorch\footnote{\href{http://pytorch.org/}{http://pytorch.org/}}.
+
+\textbf{Model parameters.} The size of all embeddings is 256, except for word embeddings, which is 300. For word embeddings we used preptrained Common Crawl GloVe vectors \parencite{pennington2014}. We have not freeze weights of word embeddings, so  pretrained values can be additionaly adjusted during training. The dimensions of encoder and decoder hidden states and memory cells are 256. Hidden states of attention and pointer networks are of size 50. Also, we used last state of encoder as initial state of decoder (thought vector). For decoding we used beam size 10.
+
+% https://r2rt.com/non-zero-initial-states-for-recurrent-neural-networks.html
+\textbf{Regularization.} Since our datasets are relatively small for  a such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similary to approach described in work of \cite{zimmermann2012} we added Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. This methods added statistically significant improvement of both validation and test scores.
 
 \section{Evaluation metrics}
 BLEU
@@ -23,6 +74,5 @@ analysis) as future work.
 \section{Results}
 
 Describe previous results. Could be used results from \cite{Yin2017} and \cite{Barone2017}.
-Dropout
 
 

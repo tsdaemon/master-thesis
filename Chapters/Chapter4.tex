@@ -220,38 +220,6 @@ Usage of concatenated vector $[h^{(t)}, \phi^{(t)}]$ for token generation probab
 
 \section{Training and Inference}
 
-\begin{table}
-\centering
-\begin{tabular}{ l l l }
-\hline
-\textbf{Dataset} & \textbf{HS} & \textbf{Django} \\
-\hline 
-Train & 533 & 16.000 \\ 
-Development & 66 & 1.000 \\ 
-Test & 66 & 1.805 \\ 
-\hline
-Avg. tokens in description & 39.1 & 14.3 \\
-Avg. characters in code & 360.3 & 41.1 \\
-Avg. size of AST (\# nodes) & 136.6 & 17.2 \\
- \hline
- \hline
-\multicolumn{3}{c}{Statistics of Grammar} \\
-terminal vocabulary size & 1361 & 6733 \\ 
-\hline
-\multicolumn{3}{l}{\textbf{w/o unary closures}} \\
-\# productions & 100 & 222 \\
-\# node types & 61 & 96 \\
-Avg. \# of actions per example & 173.4 & 20.3 \\ 
-\hline
-\multicolumn{3}{l}{\textbf{w/ unary closures}} \\
-\# productions & 100 & 237 \\
-\# node types & 57 & 92 \\
-Avg. \# of actions per example & 141.7 & 16.4 \\ 
-\hline
-\end{tabular}
-\caption{Statistics of datasets and associated grammars}
-\end{table}
-
 Values for all weights and biases was inferred from training examples, as described in Eq. \ref{eqn:mle}. Each AST $\tau$ from training examples was transformed into sequence of oracle actions. The next decoder input selected from oracle sequence (teacher forcing, section \ref{seq2seq}). The model is  optimized by maximizing the log-likelihood of the oracle actions sequence. Optimization was performed by the method of error backpropagation with Adam \parencite{Kingma2014} algorigthm. At inference time, given an NL description, we use beam search, described in section \ref{beam} to approximate the best AST $\hat{y}$ in Eq. \ref{eqn:main_problem}.
 
 
