@@ -1,28 +1,13 @@
 \chapter{Experiments} \label{Chapter5} 
 
-\section{Datasets preprocessing} \label{preprocessing}
+\section{Datasets}
+\textbf{HearthStone (HS)}  dataset \parencite{Ling2016} is a collection of Python classes which implements cards from the card game HearthStone. Each card has a set of attributes which is concatenated to produce the input sequence. The dataset contains 665 Python classes with descriptions.
 
-All input descriptions was tokenized using NLTK\footnote{\href{http://www.nltk.org/}{http://www.nltk.org/}}. For \emph{HS} we also constructed synthetic description, using structured part of target class descriptions (Tab. \ref{table:hs_input}). Then all descriptions was parsed to trees with three different approaches, described below.
+\textbf{Django} dataset \parencite{Oda2015} contains a corpus of lines of Python code with manually annotated pseudocode from the Django web framework. Corpus contains 18,805 pairs of Python statements and corresponding English pseudo-codes. 
 
-\begin{table}[h]
-\begin{tabularx}{\textwidth}{ l X }
-\hline
-\textbf{Structured input:} & Deadly Poison NAME\_END -1 ATK\_END -1 DEF\_END 1 COST\_END -1 DUR\_END Spell TYPE\_END Rogue PLAYER\_CLS\_END NIL RACE\_END Free RARITY\_END Give your weapon +2 Attack. \\
-\hline 
-\textbf{Synthetic description:} & Name: Deadly Poison, attack: -1, defence: -1, cost: 1, duration: -1, type: Spell, player class: Rogue, race: None, rarity: Free. Give your weapon +2 Attack. \\
-\hline
-\end{tabularx}
-\caption[Synthetic description example]{Synthetic description for the item \#3 from the developer split of \emph{HS}.}
-\label{table:hs_input}
-\end{table}
-
-To create CFG sentence representation we used \code{LexicalizedParser} \parencite{klein2003} from Stanford CoreNLP\footnote{\href{https://stanfordnlp.github.io/CoreNLP}{https://stanfordnlp.github.io/CoreNLP}} Java package. Dependency parsing was done by \code{DependencyParser} \parencite{chen2014} from the same CoreNLP package. For CCG parsing we used package EasyCCG\footnote{\href{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}} \parencite{lewis2014}.\footnote{We were not able to include figures with examples parse trees in the thesis due to their large size, but you can find them at our \href{https://github.com/tsdaemon/treelstm-code-generation/tree/master/pictures}{GitHub repo}}
-
-% https://nlp.stanford.edu/pubs/glove.pdf 
-
-\begin{table}
+\begin{table}[p]
 \centering
-\begin{tabular}[h]{ l l l }
+\begin{tabular}{ l l l }
 \hline
 \textbf{Dataset} & \textbf{HS} & \textbf{Django} \\
 \hline 
@@ -30,27 +15,49 @@ Train & 533 & 16.000 \\
 Development & 66 & 1.000 \\ 
 Test & 66 & 1.805 \\ 
 \hline
-Avg. tokens in description & 39.1 & 14.3 \\
-Avg. characters in code & 360.3 & 41.1 \\
-Avg. size of AST (\# nodes) & 136.6 & 17.2 \\
+Avg. tokens in description$^\dagger$ & 39.1 & 14.3 \\
+Avg. nodes in constituency tree & 93.5 & - \\
+Avg. nodes in CCG & 109.4 & - \\
+Avg. characters in code$^\dagger$ & 360.3 & 41.1 \\
+Avg. size of AST (\# nodes)$^\dagger$ & 136.6 & 17.2 \\
  \hline
  \hline
 \multicolumn{3}{c}{Statistics of Grammar} \\
-terminal vocabulary size & 1361 & 6733 \\ 
+terminal vocabulary size$^\dagger$ & 1361 & 6733 \\ 
 \hline
 \multicolumn{3}{l}{\textbf{w/o unary closures}} \\
-\# productions & 100 & 222 \\
-\# node types & 61 & 96 \\
-Avg. \# of actions per example & 173.4 & 20.3 \\ 
+\# productions$^\dagger$ & 100 & 222 \\
+\# node types$^\dagger$ & 61 & 96 \\
+Avg. \# of actions per example$^\dagger$ & 173.4 & 20.3 \\ 
 \hline
 \multicolumn{3}{l}{\textbf{w/ unary closures}} \\
-\# productions & 100 & 237 \\
-\# node types & 57 & 92 \\
-Avg. \# of actions per example & 141.7 & 16.4 \\ 
+\# productions$^\dagger$ & 100 & 237 \\
+\# node types$^\dagger$ & 57 & 92 \\
+Avg. \# of actions per example$^\dagger$ & 141.7 & 16.4 \\ 
 \hline
 \end{tabular}
-\caption[Statistics of datasets]{Statistics of datasets and associated grammars \parencite{Yin2017}}
+\caption[Statistics of datasets]{Statistics of datasets and associated grammars ($^\dagger$Previously reported by \cite{Yin2017}).}
 \end{table}
+
+% \cite{Barone2017} (BS) created the dataset of Python code with parallel descriptions from GitHub. It contains 150,370 triples of function declarations, docstrings and bodies. This dataset presents the most challenging task because it contains highly heterogeneous and noisy data. Django pseudo-code already has a good alignment with target code and HeartStone code examples are mostly homogeneous and target specific domain.
+
+\subsection{Preprocessing} \label{preprocessing}
+
+All input descriptions was tokenized using Stanford CoreNLP\footnote{\href{https://stanfordnlp.github.io/CoreNLP}{https://stanfordnlp.github.io/CoreNLP}} Java package. For \textbf{HS} we also constructed synthetic description, using structured part of target class descriptions (Tab. \ref{table:hs_input}). Then all descriptions was parsed to trees with three different approaches, described below.
+
+\begin{table}[p]
+\begin{tabularx}{\textwidth}{ l X }
+\hline
+\textbf{Structured input:} & Deadly Poison NAME\_END -1 ATK\_END -1 DEF\_END 1 COST\_END -1 DUR\_END Spell TYPE\_END Rogue PLAYER\_CLS\_END NIL RACE\_END Free RARITY\_END Give your weapon +2 Attack. \\
+\hline 
+\textbf{Synthetic description:} & Name: Deadly Poison, attack: -1, defence: -1, cost: 1, duration: -1, type: Spell, player class: Rogue, race: None, rarity: Free. Give your weapon +2 Attack. \\
+\hline
+\end{tabularx}
+\caption[Synthetic description example]{Synthetic description for the item \#3 from the developer split of \textbf{HS}.}
+\label{table:hs_input}
+\end{table}
+
+To create CFG sentence representation we used \code{LexicalizedParser} \parencite{klein2003} from the CoreNLP. Dependency parsing was done by \code{DependencyParser} \parencite{chen2014} from the CoreNLP. For CCG parsing we used package EasyCCG\footnote{\href{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}} \parencite{lewis2014}.\footnote{We were not able to include figures with examples parse trees in the thesis due to their large size, but you can find them at our \href{https://github.com/tsdaemon/treelstm-code-generation/tree/master/pictures}{GitHub repo}}
 
 \section{Implementation details}
 
@@ -59,20 +66,13 @@ Avg. \# of actions per example & 141.7 & 16.4 \\
 \textbf{Model parameters.} The size of all embeddings is 256, except for word embeddings, which is 300. For word embeddings we used preptrained Common Crawl GloVe vectors \parencite{pennington2014}. We have not freeze weights of word embeddings, so  pretrained values can be additionaly adjusted during training. The dimensions of encoder and decoder hidden states and memory cells are 256. Hidden states of attention and pointer networks are of size 50. Also, we used last state of encoder as initial state of decoder (thought vector). For decoding we used beam size 10.
 
 % https://r2rt.com/non-zero-initial-states-for-recurrent-neural-networks.html
-\textbf{Regularization.} Since our datasets are relatively small for  a such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similary to approach described in work of \cite{zimmermann2012} we added Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. This methods added statistically significant improvement of both training speed and validation scores.
+\textbf{Regularization.} Since our datasets are relatively small for  a such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similary to approach described in work of \cite{zimmermann2012} we added Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. These methods added statistically significant improvement of both training speed and validation scores.
 
-\section{Evaluation metrics}
-BLEU
-Accuracy
-Error
+\section{Experimental setup}
 
-rewrite: These two metrics are not ideal: accuracy only measures exact match and thus lacks the ability to give credit to semantically correct code that is different from the reference, while it is not clear whether BLEU provides an appropriate proxy for measuring semantics in the code generation task. A more
-intriguing metric would be directly measuring semantic/functional code equivalence, for which we present a pilot study
-at the end of this section (cf. Error Analysis). We leave exploring more sophisticated metrics (e.g. based on static code
-analysis) as future work.
+\textbf{Evaluation metrics.} For this experiment we measured \textbf{accuracy} as a fraction of output code which fully match target examples. Additionally, to measure quality of examples without full match we used average token level \textbf{BLEU-4}, as suggested by \cite{Ling2016} and \cite{Yin2017}. However, BLEU and accuracy do not measure actual correctness of a generated code. Therefore we defined an \textbf{errors} metric as a fraction of output trees which we was not able to convert into code.
 
-\section{Results}
+\textbf{Baseline.} Along with Tree-LSTM encoder we prepared model previously decribed in work of \cite{Yin2017}, with vanilla bidirectional LSTM encoder. This was done to have clear baseline for semantic encoding method. 
 
-Describe previous results. Could be used results from \cite{Yin2017} and \cite{Barone2017}.
 
 
