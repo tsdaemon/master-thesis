@@ -5,7 +5,7 @@
 
 \textbf{Django} dataset \parencite{Oda2015} contains a corpus of lines of Python code with manually annotated pseudocode from the Django web framework. Corpus contains 18,805 pairs of Python statements and corresponding English pseudo-codes. 
 
-\begin{table}[p]
+\begin{table}
 \centering
 \begin{tabular}{ l l l }
 \hline
@@ -15,15 +15,15 @@ Train & 533 & 16.000 \\
 Development & 66 & 1.000 \\ 
 Test & 66 & 1.805 \\ 
 \hline
-Avg. tokens in description$^\dagger$ & 39.1 & 14.3 \\
-Avg. nodes in constituency tree & 93.5 & - \\
-Avg. nodes in CCG & 109.4 & - \\
-Avg. characters in code$^\dagger$ & 360.3 & 41.1 \\
-Avg. size of AST (\# nodes)$^\dagger$ & 136.6 & 17.2 \\
+Avg. tokens in description$^*$ & 47.3 & 13.7 \\
+Avg. nodes in constituency tree & 93.5 & 26.3 \\
+Avg. nodes in CCG tree & 109.4 & 28 \\
+Avg. characters in code & 324.3 & 43.9 \\
+Avg. size of AST (\# nodes) & 66.4 & 9.5 \\
  \hline
  \hline
 \multicolumn{3}{c}{Statistics of Grammar} \\
-terminal vocabulary size$^\dagger$ & 1361 & 6733 \\ 
+terminal vocabulary size & 550 & 3466 \\ 
 \hline
 \multicolumn{3}{l}{\textbf{w/o unary closures}} \\
 \# productions$^\dagger$ & 100 & 222 \\
@@ -36,16 +36,44 @@ Avg. \# of actions per example$^\dagger$ & 173.4 & 20.3 \\
 Avg. \# of actions per example$^\dagger$ & 141.7 & 16.4 \\ 
 \hline
 \end{tabular}
-\caption[Statistics of datasets]{Statistics of datasets and associated grammars ($^\dagger$Previously reported by \cite{Yin2017}).}
+\caption[Statistics of datasets]{Statistics of datasets and associated grammars ($^\dagger$Previously reported by \cite{Yin2017}. $^*$Number of dependency tree nodes is equal to a number of tokens in descrition.)}
 \end{table}
 
 % \cite{Barone2017} (BS) created the dataset of Python code with parallel descriptions from GitHub. It contains 150,370 triples of function declarations, docstrings and bodies. This dataset presents the most challenging task because it contains highly heterogeneous and noisy data. Django pseudo-code already has a good alignment with target code and HeartStone code examples are mostly homogeneous and target specific domain.
 
 \subsection{Preprocessing} \label{preprocessing}
 
-All input descriptions was tokenized using Stanford CoreNLP\footnote{\href{https://stanfordnlp.github.io/CoreNLP}{https://stanfordnlp.github.io/CoreNLP}} Java package. For \textbf{HS} we also constructed synthetic description, using structured part of target class descriptions (Tab. \ref{table:hs_input}). Then all descriptions was parsed to trees with three different approaches, described below.
+All input descriptions was tokenized using Stanford CoreNLP\footnote{\href{https://stanfordnlp.github.io/CoreNLP}{https://stanfordnlp.github.io/CoreNLP}} Java package. Quoted text, which might be refered as values for string constants, replaced with special markers (Tab. \ref{table:str_markers}). Nested object references, like \code{re.findall} was split by the period so pointer network can copy each part separately (Tab. \ref{table:function_calls}). For \textbf{HS} we also constructed synthetic description, using structured part of target class descriptions (Tab. \ref{table:hs_input}). Then all descriptions was parsed to trees with three different approaches, described below.
 
-\begin{table}[p]
+\begin{table}
+\begin{tabularx}{\textwidth}{ l X }
+\hline
+\textbf{Input query:} & while '<' is contained in value and '>' is contained in value, \\
+\hline 
+\textbf{Input query preprocessed:} & while \_STR\_0\_ is contained in value and \_STR\_1\_ is contained in value , \\
+\hline 
+\textbf{Target code:} & while '<' in value and '>' in value: \\
+\hline 
+\textbf{Target code preprocessed:} & while '\_STR\_0\_' in value and '\_STR\_1\_' in value: \\
+\hline
+\end{tabularx}
+\caption[Quoted items preprocessing]{Quoted items preprocessing item \#2 from the developer split of \textbf{Django}.}
+\label{table:str_markers}
+\end{table}
+
+\begin{table}
+\begin{tabularx}{\textwidth}{ l X }
+\hline
+\textbf{Input query:} & from django.utils.six.moves import html\_parser as \_html\_parse into default name space. \\
+\hline 
+\textbf{Input query preprocessed:} & from django.utils.six.moves ( django utils six moves ) import html\_parser as \_html\_parse into default name space . \\
+\hline 
+\end{tabularx}
+\caption[Nested object references preprocessing]{Nested bject references preprocessing for item \#93 from the developer split of \textbf{Django}.}
+\label{table:function_calls}
+\end{table}
+
+\begin{table}
 \begin{tabularx}{\textwidth}{ l X }
 \hline
 \textbf{Structured input:} & Deadly Poison NAME\_END -1 ATK\_END -1 DEF\_END 1 COST\_END -1 DUR\_END Spell TYPE\_END Rogue PLAYER\_CLS\_END NIL RACE\_END Free RARITY\_END Give your weapon +2 Attack. \\
@@ -68,11 +96,26 @@ To create CFG sentence representation we used \code{LexicalizedParser} \parencit
 % https://r2rt.com/non-zero-initial-states-for-recurrent-neural-networks.html
 \textbf{Regularization.} Since our datasets are relatively small for  a such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similary to approach described in work of \cite{zimmermann2012} we added Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. These methods added statistically significant improvement of both training speed and validation scores.
 
-\section{Experimental setup}
+\section{Experimental setup} \label{exp_setup}
 
 \textbf{Evaluation metrics.} For this experiment we measured \textbf{accuracy} as a fraction of output code which fully match target examples. Additionally, to measure quality of examples without full match we used average token level \textbf{BLEU-4}, as suggested by \cite{Ling2016} and \cite{Yin2017}. However, BLEU and accuracy do not measure actual correctness of a generated code. Therefore we defined an \textbf{errors} metric as a fraction of output trees which we was not able to convert into code.
 
 \textbf{Baseline.} Along with Tree-LSTM encoder we prepared model previously decribed in work of \cite{Yin2017}, with vanilla bidirectional LSTM encoder. This was done to have clear baseline for semantic encoding method. 
+
+\section{Results}
+
+\begin{table}
+\begin{tabular}{ l c c c c c c }
+
+\hline
+& \multicolumn{3}{c}{HS} & \multicolumn{3}{c}{Django}
+\hline
+\textbf{Retrieval system:^\dagger} & \\
+\hline 
+\end{tabular}
+\caption[Final results]{Evaluation results for both datasets. ^\dagger Results previously reported by \cite{Ling2016}. ^\ddagger Results previously reported by cite{Yin2017}.}
+\label{table:evaluation}
+\end{table}
 
 
 
