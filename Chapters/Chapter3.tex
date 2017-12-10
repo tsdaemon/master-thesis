@@ -30,7 +30,7 @@ A formalization of such rule-based sentence structure system is called a \emph{p
 $V_N$ is a non terminal vocabulary, which contains the lexical and syntactic category labels;
 $V_T$ is terminal vocabulary and it contains a set of words.
 $P$ identifies the collection of the production rules of the grammar.
-To illustrate this concept, I present a short grammar to parse a sentence \textquote{good dogs like cats} to its syntactic representation. The grammar for this example contains following vocabulary:
+To illustrate this concept, I present a short grammar to parse a sentence \textquote{good dogs like cats} to its syntactic representation. The grammar for this example contains the following vocabulary:
 \begin{equation}
 \begin{split}
 V_N = {S, NP, VP, A, N, V}\\
@@ -61,15 +61,15 @@ Phrase-based grammar might also be refered as \emph{context-free grammar}, beaus
 \end{figure}
 
 \subsection{Combinatory-categorial grammar}
-Phrase-structure grammars analyze the sentence recursively applying rewriting rules, starting from identification of the parts of speech or lexical categories of individual words. This rule governs how words can be combined into phrases and sentences. Compared with phrase-structure grammars, \emph{combinatory-categorial grammars} do not contain a separate collection of category-combining rules. Lexical categories of words such as adjectives and nouns describe the functions that determine how these words can combine with other categories. Each node in CCG tree can be translated into lambda calculus, thus CCG is a transparent interface between syntax and semantics of a sentence.
+Phrase-structure grammars analyze the sentence recursively applying rewriting rules, starting from identification of the parts of speech or lexical categories of individual words. This rule governs how words can be combined into phrases and sentences. Compared with phrase-structure grammars, \emph{combinatory-ca\-te\-go\-rial grammars} do not contain a separate collection of category-combining rules. Lexical categories of words such as adjectives and nouns describe the functions that determine how these words can combine with other categories. Each node in CCG tree can be translated into lambda calculus representation \parencite{artzi2013}, thus CCG is a transparent interface between syntax and semantics of a sentence.
 
-Consider an example. Adjective \textquote{good} is in a category corresponding to a function that maps from the nouns into the noun phrases. The association of this item with a function looks like that:
+Consider an example. Adjective \textquote{good} is in the category corresponding to a function that maps from the nouns into the noun phrases. The association of this item with a function looks like that:
 
 \begin{verbatim}
 good = NP/N 
 \end{verbatim}
 
-$\lambda x.good(x)$\footnote{To make connection of CCG categories with lambda calculus clear, we will complement each example of categorial operations with corresponding lines of lambda calculus.}
+$\lambda x.good(x)$\footnote{To make connection of CCG categories with lambda calculus clear, we will complement each example of categorial operations with the corresponding lines of lambda calculus.}
 
 \code{NP} on the left side of the slash character denotes function return value and \code{N} on the right side denotes function argument. This function could be resolved with forward function application operation, denoted by character \code{>}:
 
@@ -80,12 +80,12 @@ good dogs => NP/N>N = NP
 
 $\lambda x.good(x)(DOGS)=good(DOGS)$
 
-With backward slash character \code{\textbackslash} category on the right side denotes function return and category on the left side denotes function argument. Example:
+With backward slash character \code{\textbackslash} the category on the right side denotes function return and the category on the left side denotes function argument. Example:
 
 \begin{verbatim}
 bird => N
-flies => N\textbackslash S
-bird flies => N>N\textbackslash S = S
+flies => N\S
+bird flies => N>N\S = S
 \end{verbatim}
 
 $\lambda x.flies(x)$
@@ -95,16 +95,16 @@ $\lambda x.flies(x)(BIRD)=flies(BIRD) $
 A verb such as \textquote{like} is usually taking two arguments and associated as follows:
 
 \begin{verbatim}
-like => (S/NP) \\ N
+like => (S/NP)\N
 cats => N
-like cats => (S/NP) \\ N>N = S/NP
+like cats => (S/NP)\N>N = S/NP
 \end{verbatim}
 
 $\lambda x.\lambda y.like(x, y)$
 
 $\lambda x.\lambda y.like(y, x)(CATS)=\lambda y.like(y, CATS)$
 
-The function \code{(S/NP)\\N} maps \code{N} to a range of functions of form \code{S/NP}.  Character \code{<} denotes backward function application. Final sentence example:
+The function \code{(S/NP)\textbackslash N} maps \code{N} to a range of functions of the form \code{S/NP}.  Character \code{<} denotes backward function application. Final sentence example:
 
 \begin{verbatim}
 good dogs => NP
@@ -128,9 +128,9 @@ $\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
 
 \footnotetext{Picture is created in \href{http://grammarscope.sourceforge.net/}{GrammarScope}.}
 
-Another approach to represent sentence semantical structure is \emph{dependency parsing}. \emph{Dependency grammar} is different from constituency grammars like CFG or CCG, which build sentence tree by applying rewrite rules to constitute high level phrases from low level syntactic categories and lexems. It also defines sentence structure as a graph, but without phrasal nodes like \code{NP} or \code{VP}. Instead each node represent one word which points to it dependent. Since such representation do not rely on established phrase word order it is well suited for the analysis of languages with free word order, such as Ukrainian.
+Another approach to represent sentence semantical structure is \emph{dependency parsing}. \emph{Dependency grammar} is different from constituency grammars like CFG or CCG, which build sentence tree by applying rewrite rules to constitute high level phrases from low level syntactic categories and lexems. Dependency graph also defines sentence structure as a graph, but without phrasal nodes like \code{NP} or \code{VP}. Instead each node represent one word which points to it dependent. Since such representation do not rely on established phrase word order it is well suited for the analysis of languages with free word order, such as Ukrainian.
 
-In Fig \ref{fig:dependency_graph} sentence \textquote{nice dogs like cats} parsed to dependency graph. It consists of following dependencies: 
+In Fig \ref{fig:dependency_graph} sentence \textquote{nice dogs like cats} is parsed to dependency graph. It consists of the following dependencies: 
 
 \begin{verbatim}
 amod = adjectival modifier
@@ -254,14 +254,14 @@ Weights for attention vector $\alpha^{(t-1)}$ can be calculated with arbitrary a
 This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
 
 \subsection{Beam search} \label{beam}
-When the model learned the probability model on train examples, it can generate new translations. This can be done in several ways \parencite{Neubig2017}:
+When the model learned the probability model on training examples, it can generate new translations. This can be done in several ways \parencite{Neubig2017}:
         \begin{itemize}
     	\item \textbf{Random Sampling:} For each time step $t$ randomly select an output words $w^{(t)}$ for $y$ from the probability distribution $P(y|x)$.
     	\item \textbf{Gready Search:} Find the $y$ that maximizes $P(y|x)$, selecting each next word $w^{(i)}$ with maximum probability $\hat{w^{(t)}} = \underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$.
     	\item \textbf{Beam Search:} Find the $n$ outputs with the highest probabilities according to $P(y|x)$.
     \end{itemize}
 
-\emph{Beam search} is similar to greedy search, but instead of considering only the one best hypothesis $\underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$, its consider $b$ best hypotheses at each time step, where $b$ is the width of the beam. To find best hypotheses, beam search explores the generation graph in breadth-first manner. At each level of the search tree it calculates probability for each candidates from target space and then selects $b$ variants with the highest probability. This way it allows to generate sequences with higher cumulative probability, wchich could be dropped by the greedy search.
+\emph{Beam search} is similar to greedy search, but instead of considering only the one best hypothesis $\underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$, its consider $b$ best hypotheses at each time step, where $b$ is the width of the beam. To find best hypotheses, beam search explores the generation graph in breadth-first manner. At each level of the search tree it calculates probability for each candidates from target space and then selects $b$ variants with the highest probability. This way it allows to generate sequences with higher cumulative probability, wchich could have been missed by the greedy search.
 
 \section{Recursive neural networks} \label{sec:rvnn}
 % reflects domain knowledge
@@ -275,7 +275,7 @@ The architecture of recurrent neural network contains inductive bias about condi
 \label{fig:rvnn}
 \end{figure}
 
-Topological structures with variable length could be modeled by neural networks recursively applying the same set of weights to each node. To model syntactic tree, each word is represented by corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of sentence \textquote{good dog like cats} could be modeled i the following way:
+Topological structures with variable length could be modeled by neural networks recursively applying the same set of weights to each node. To model syntactic tree, each word is represented by corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of sentence \textquote{good dog like cats} could be modeled in the following way:
 \begin{equation}
 \begin{split}
 h_{NP} = f(W\cdot[w_{good}, w_{dog}] + b)\\

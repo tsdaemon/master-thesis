@@ -154,7 +154,7 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{declaration}
 \addchaptertocentry{\authorshipname} % Add the declaration to the table of contents
-\noindent I, \authorname, declare that this thesis titled, \enquote{\ttitle} and the work presented in it are my own. I confirm that:
+\noindent I, \authorname, declare that this thesis, titled \enquote{\ttitle} and the work presented in it are my own. I confirm that:
 
 \begin{itemize} 
 \item This work was done wholly or mainly while in candidature for a research degree at this University.
@@ -174,15 +174,9 @@ headsepline, % Uncomment to get a line under the header
 
 \cleardoublepage
 
-%\vspace*{0.2\textheight}
-
-%\noindent\enquote{\itshape Thanks to my solid academic training, today I can write hundreds of words on virtually any topic without possessing a shred of information, which is how I got a good job in journalism.}\bigbreak
-
-%\hfill Dave Barry
-
 \begin{abstract}
-\addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-Software development requires vast knowledge about different programming tools which cannot be kept in human memory. Though software developers often formulate their task in human language to query online knowledge bases like StackOverflow to get short snippets of code. In this work, I explore the way of code generation from natural language description and build an IDE plugin for Python which translates descriptions to short snippets of code. My code generator parses human language to a syntactic tree, translates it to Python abstract syntax tree and generates from it actual code. RESULTS WILL BE HERE.
+\addchaptertocentry{\abstractname} 
+Software development requires vast knowledge of different programming tools which cannot be kept in human memory. Therefore software developers often formulate their task in human language to query online knowledge bases like StackOverflow to get short snippets of code. In this work, we explored the way of code generation from natural language description and prepared web API for Python which translates NL descriptions to short snippets of code. Our model resembles recursive encoder and uses syntactic trees instead of plain sequence on input. Results have not outperformed current state-of-the-art performance. However, presented Tree2Tree model has potential in other applications and this work makes a solid background for a further research.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
@@ -193,7 +187,7 @@ Software development requires vast knowledge about different programming tools w
 \addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
 I would like to thank Vsevolod Dyomkin and Rostyslav Hryniv who supervised and directed my research during thesis writing. Special thanks to Artem Chernodub for hints about neural network implementation.
 
-This work would not be possible without computational resources for neural network training provided by ArviLab. Thanks to CoreNLP and EasyCCG developers, who provided great tools for scientific research. Thanks to PyTorch team for the easy and handy DNN framework.
+This work would not be possible without computational resources for neural network training provided by ArviLab. Thanks to CoreNLP and EasyCCG developers, who provided great tools for natural language parsing. And thanks to PyTorch team for the easy and handy DNN framework.
 
 Last, but not least I am grateful to Ukrainian Catholic University and Oleksii Molchanovskyi personally for the first in Ukraine master program in data science.
 \end{acknowledgements}

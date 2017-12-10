@@ -104,9 +104,10 @@ To create CFG sentence representation we used \code{LexicalizedParser} \parencit
 
 \section{Results}
 Evaluation results are listed in Tab. \ref{table:evaluation}. The best model was selected using results of evaluation on development set and then evaluated on the separate test set. We compared with two approaches: (1) Latent Predictor Network (LPN) \parencite{Ling2016} and (2) Syntactic Neural Model \parencite{Yin2017}. 
-\textbf{Results analysis.} As presented in Tab. \ref{table:evaluation}, performance of models with Tree-LSTM encoder have results comparable with LPN. Yet no model was able to improve current state-of-the-art results of Syntactic Neural Model. 
 
-Although all type of query trees have almost equal performance, dependency trees encoding have shown better results for HS. Dependency trees do not contain phrasal node and therefore shorter. This can be a proper justification for the difference.
+\textbf{Results analysis.} As presented in Tab. \ref{table:evaluation}, performance of models with Tree-LSTM encoder have results comparable with LPN. Yet no model was able to improve current state-of-the-art results of Syntactic Neural Model. Also, tree encoders have shown much higher rate of errors than BiLSTM encoder.
+
+Although all type of query trees have almost equal performance, dependency trees encoding have shown better results for HS. Dependency trees do not contain phrasal node and therefore shorter. This can be a proper justification for the difference for the dataset with long and homogeneous descriptions.
 
 \begin{table}
 \begin{tabular}[h]{ l c c c c c c }
