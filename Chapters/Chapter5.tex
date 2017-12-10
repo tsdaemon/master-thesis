@@ -103,19 +103,47 @@ To create CFG sentence representation we used \code{LexicalizedParser} \parencit
 \textbf{Baseline.} Along with Tree-LSTM encoder we prepared model previously decribed in work of \cite{Yin2017}, with vanilla bidirectional LSTM encoder. This was done to have clear baseline for semantic encoding method. 
 
 \section{Results}
+Evaluation results are listed in Tab. \ref{table:evaluation}. The best model was selected using results of evaluation on development set and then evaluated on the separate test set. We compared with two approaches: (1) Latent Predictor Network (LPN) \parencite{Ling2016} and (2) Syntactic Neural Model \parencite{Yin2017}. 
+\textbf{Results analysis.} As presented in Tab. \ref{table:evaluation}, performance of models with Tree-LSTM encoder have results comparable with LPN. Yet no model was able to improve current state-of-the-art results of Syntactic Neural Model. 
+
+Although all type of query trees have almost equal performance, dependency trees encoding have shown better results for HS. Dependency trees do not contain phrasal node and therefore shorter. This can be a proper justification for the difference.
 
 \begin{table}
-\begin{tabular}{ l c c c c c c }
+\begin{tabular}[h]{ l c c c c c c }
 
 \hline
-& \multicolumn{3}{c}{HS} & \multicolumn{3}{c}{Django}
+& \multicolumn{3}{c}{\textbf{HS}} & \multicolumn{3}{c}{\textbf{Django}}\\
 \hline
-\textbf{Retrieval system:^\dagger} & \\
+& ACC & BLEU & ERROR & ACC & BLEU & ERROR \\
+\hline
+Retrieval system:$^\dagger$ & 0.0 & 62.5 & - & 14.7 & 18.6 & - \\
+Phrasal statistical MT:$^\dagger$ & 0.0 & 34.1 & - & 31.5 & 47.6 & - \\
+Hierarchical statistical MT:$^\dagger$ & 0.0 & 43.2 & - & 9.5 & 35.9 & - \\
 \hline 
+NMT$^\ddagger$ & 1.5 & 60.4 & - & 45.1 & 63.4 & - \\
+Seq2Tree$^\ddagger$ & 1.5 & 53.4 & - & 28.9 & 44.6 & - \\
+Seq2Tree-UNK$^\ddagger$ & 13.6 & 62.8 & - & 39.4 & 58.2 & - \\
+LPN$^\dagger$ & 4.5 & 65.6 & - & 62.3 & 77.6 & - \\
+Syntactic Neural Model$^\ddagger$ & \textbf{16.7} & \textbf{75.8} & - & \textbf{71.6} & \textbf{84.5} & - \\
+\hline
+\multicolumn{7}{l}{\textbf{w/ unary closures:}}\\
+Bi-directional LSTM encoder & 9.1 & 71.6 & 0.6 &  \\
+\multicolumn{7}{l}{Tree-LSTM encoder} \\
+\ with dependency trees & 4.5 & 66.7 & 3.0 &  \\
+\ with constituency trees & 4.5 & 63.9 & 13.2 &  \\
+\ with CCG trees & 3.0 & 66.1 & 5.1 &  \\
+\multicolumn{7}{l}{\textbf{w/o unary closures:}}\\
+Bi-directional LSTM encoder & 16.2 & 69.2 & 0.3 &  \\
+\multicolumn{7}{l}{Tree-LSTM encoder} \\
+\ with dependency trees & 6 & 71.5 & 4.0 &  \\
+\ with constituency trees & 4.5 & 64.9 & 13.2 &  \\
+\ with CCG trees & 3.0 & 65.3 & 11.0 &  \\
+\hline
 \end{tabular}
-\caption[Final results]{Evaluation results for both datasets. ^\dagger Results previously reported by \cite{Ling2016}. ^\ddagger Results previously reported by cite{Yin2017}.}
+\caption[Final results]{Evaluation results for both datasets. $^\dagger$Results previously reported by \cite{Ling2016}. $^\ddagger$Results previously reported by \cite{Yin2017}.}
 \label{table:evaluation}
 \end{table}
+
 
 
 
