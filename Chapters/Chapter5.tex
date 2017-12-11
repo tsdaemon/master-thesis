@@ -117,48 +117,48 @@ Results of the model with BiLSTM encoder match the previously reported results o
 
 Dependency trees encoding has shown better results for \textbf{HS}. Dependency trees do not contain phrasal nodes and therefore shorter. This can be a proper justification for the difference in results for \textbf{HS} which contains long and similar descriptions. However, results for the \textbf{Django} dataset  have a contrary bias. The performance of dependency trees is much lower than the performance of CFG and CCG trees. It can be explained by the fact, that \textbf{Django} has shorter and more divergent queries and due to this properties its dependency trees has lower generalization ability. CCG and CFG trees have less divergent structures where each node have no more than two children. Therefore informational flow in such trees might have higher approximation abilities. Yet this is only our assumption and it requires additional research.
 
-\section{Case studies}
+% \section{Case studies}
 
-\begin{table}[h]
-\begin{tabular}{ l m{5cm} }
-\hline
-\textbf{Query:} &  \\
-\hline 
-\hline 
-\textbf{Sequential encoder results:} & 
-\begin{verbatim} 
-tralivali 
-ululu
-\end{verbatim}
-\\
-\hline
-\textbf{Tree encoding result:} & \\
-\hline
-\ \textbf{dependency tree} & 
+% \begin{table}[h]
+% \begin{tabular}{ l m{5cm} }
+% \hline
+% \textbf{Query:} &  \\
+% \hline 
+% \hline 
+% \textbf{Sequential encoder results:} & 
 % \begin{verbatim} 
 % tralivali 
 % ululu
-% \end{verbatim} 
-\\
-\hline
-\ \textbf{constituency tree} & 
-% \begin{verbatim} 
-% tralivali 
-% ululu
-% \end{verbatim} 
-\\
-\hline
-\ \textbf{CCG tree} & 
-% \begin{verbatim} 
-% tralivali 
-% ululu
-% \end{verbatim} 
-\\
-\hline
-\end{tabular}
-\caption[Translation example for HS]{Translation example for the item \#4 from the test split of \textbf{HS}.}
-\label{table:hs_case}
-\end{table}
+% \end{verbatim}
+% \\
+% \hline
+% \textbf{Tree encoding result:} & \\
+% \hline
+% \ \textbf{dependency tree} & 
+% % \begin{verbatim} 
+% % tralivali 
+% % ululu
+% % \end{verbatim} 
+% \\
+% \hline
+% \ \textbf{constituency tree} & 
+% % \begin{verbatim} 
+% % tralivali 
+% % ululu
+% % \end{verbatim} 
+% \\
+% \hline
+% \ \textbf{CCG tree} & 
+% % \begin{verbatim} 
+% % tralivali 
+% % ululu
+% % \end{verbatim} 
+% \\
+% \hline
+% \end{tabular}
+% \caption[Translation example for HS]{Translation example for the item \#4 from the test split of \textbf{HS}.}
+% \label{table:hs_case}
+% \end{table}
 
 
 \begin{table}[p]
