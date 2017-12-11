@@ -1,7 +1,7 @@
 \chapter{Python 3.6 abstract syntax tree grammar} 
 \label{AppendixA} 
 
-The following grammar is taken from official documentation of Python module \href{https://docs.python.org/3/library/ast.html}{ast}. It contains description of all AST rules. Each rule describes how specific node type expands to other nodes and what types of children it could contain. Modifier \code{*} denotes that there could be multiple child nodes of that type. Modifier \code{?} denotes that this child node is optional. For example, \code{Assert(expr test, expr? msg)} mean that node \code{Assert} requires expression to test and optionally it could contain expression with message.
+The following grammar is taken from official documentation of Python module \href{https://docs.python.org/3/library/ast.html}{ast}. It contains the description of all AST rules. Each rule describes how specific node type expands to other nodes and what types of children it could contain. Modifier \code{*} denotes that there could be multiple child nodes of that type. Modifier \code{?} denotes that this child node is optional. For example, \code{Assert(expr test, expr? msg)} mean that node \code{Assert} requires expression to test and optionally it could contain expression with a message.
 
 \begin{verbatim}
 -- ASDL's 7 builtin types are:

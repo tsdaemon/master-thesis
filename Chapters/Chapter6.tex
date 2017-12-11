@@ -2,20 +2,23 @@
 
 \label{Chapter6} 
 
-This work we have not reached substantial performance improvement over the previous reported results. However, our study of Tree2Tree models have important value for the further exploration of machine translation and code generation. We believe, that potential of Tree-LSTM is yet to be discovered in other applications,
+In this work we have not reached substantial performance improvement over the previously reported results. Conventional approach with BiLSTM encoder has shown better results with the lower error rate. What also has a significant value, it trains faster and it can be trained using batches. However, our study of Tree2Tree models has important value for the further exploration of machine translation and code generation. We believe that potential of Tree-LSTM is yet to be discovered in other applications and want to continue our research in this field.
 
 \section{Contribution}
 In this work we made the following contribution:
 \begin{itemize}
-    \item Implemented Tree2Tree model on PyTorch\footnote{All code available on \href{https://github.com/tsdaemon/treelstm-code-generation/}{GitHub}}.
-	\item Evaluated performance of syntactic models in sequence-to-sequence model.
-	\item Created online API for code generation. \footnote{API is available \href{http://daemon-engineer.com/apps/codegen}{here}.}
+    \item Implemented Tree2Tree model on PyTorch.\footnote{All code is available on \href{https://github.com/tsdaemon/treelstm-code-generation/}{GitHub}.}
+    \item Evaluated performance of tree encoders in sequence-to-sequence model.
+    \item Created online API for code generation. \footnote{API is available \href{http://daemon-engineer.com/apps/codegen}{here}.}
 \end{itemize}
 
 \section{Points to improve}
-\textbf{Tree encoder.} Recursive encoder have not surpassed conventional bidirectional LSTM results. However, it still have potential to explore. Embeddings for lexical categories could be added to input along with word embeddings. Additional layers (recursive or recurrent) could be added on top of the first layer. But since syntactic models requires substantial effort to maintain query parsing and can not be encoded in batch, we do not consider this as a priority.
-\textbf{Code context encoding.} Our model used as input only code description. Obviously, other code around this line can contain important information which could improve generation. In this model, we used unconstrained terminal vocabulary, which is a  naive approach, since each code line has different scope of variables and functions. Therefore, usage of code context in the model can significantly improve result correctness.
-\textbf{Datasets.} Datasets used for this work has few important flaws. \textbf{HS} is homogeneous and small, therefore its can only be used for model evaluation and experiments. \textbf{Django} actually does not contains NL descriptions since it is pseudo-code generated from underlying code. Therefore this model requires evaluation on more heterogeneous datasets (like \cite{Barone2017}). And initial goal of development of IDE plugin capable to be a handy tool for any developer requires dataset which was created with special attention to the most frequent developer requests. Probably, StackOveflow can be used as a source of statistics for that.
-\textbf{Evaluation.} As mentioned in section \ref{exp_setup}, BLEU is a metric specifically designed for human languages translation evaluation, therefore it can not appropriately represent the performance of language to code translation. Tools like unit testing or static code analysis can provide measurements more relevant to this domain field. This should be considered during development of more appropriate language to code dataset.
-\textbf{Another applications.} Developed in this project codebase can easily reused. The idea of structured decoding has great potential in other problems like question answering or syntactic parsing. 
+\textbf{Tree encoder.} The recursive encoder has not surpassed conventional bidirectional LSTM results. However, it still has potential to explore. Embeddings for lexical categories can be added to input along with the word embeddings. Additional layers (recursive or recurrent) can be added on the top of the first layer. Knowledge about a tree structure can be induced into the attention layer to make an attention coherent with a query hierarchy. But since the syntactic models require a substantial effort to maintain the query parsing and cannot be encoded in batches, we do not consider this as a priority for the code generation task.
 
+\textbf{Code context encoding.} Our model used as an input only code description. Obviously, other code around a code line can contain important information which can be used for generation. In this model, we used unconstrained terminal vocabulary, what is the naive approach, since each code line has a different names of variables and functions in a scope. Therefore, usage of a code context in the model can made significant improvement for the correctness of the result.
+
+\textbf{Datasets.} Datasets used for this work has few important flaws. \textbf{HS} is homogeneous and small, therefore it can only be used for model evaluation and experiments. \textbf{Django} actually does not contains NL descriptions since it is pseudo-code generated from underlying code. Therefore this model requires evaluation on more heterogeneous datasets (like created \cite{Barone2017}). And the initial goal of development of IDE plugin capable to be a handy tool for any developer requires dataset which was created with special attention to the most frequent developer requests. Probably, StackOverflow can be used as a source of statistics for that.
+
+\textbf{Evaluation.} As mentioned in section \ref{exp_setup}, BLEU is a metric specifically designed for human languages translation evaluation, therefore it can not appropriately represent the performance of language to code translation. Tools like unit testing or static code analysis can provide measurements more relevant to this domain field. This should be considered during development of more appropriate language-to-code dataset.
+
+\textbf{Another applications.} Developed in this project codebase can easily be reused. The idea of the structured decoding has a great potential in other problems like question answering or text generation. We are planning to continue our research in this field on a base of this work.

@@ -30,7 +30,7 @@ A formalization of such rule-based sentence structure system is called a \emph{p
 $V_N$ is a non terminal vocabulary, which contains the lexical and syntactic category labels;
 $V_T$ is terminal vocabulary and it contains a set of words.
 $P$ identifies the collection of the production rules of the grammar.
-To illustrate this concept, I present a short grammar to parse a sentence \textquote{good dogs like cats} to its syntactic representation. The grammar for this example contains the following vocabulary:
+To illustrate this concept, we present a short grammar to parse a sentence \textquote{good dogs like cats} to its syntactic representation. The grammar for this example contains the following vocabulary:
 \begin{equation}
 \begin{split}
 V_N = {S, NP, VP, A, N, V}\\
@@ -153,9 +153,9 @@ The task of language modeling requires the transformation of words and documents
 Methods of \emph{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing to the same point as vector ‘aunt’ (see Fig \ref{fig:word_embeddings} for example).
 
 \section{Long-short term memory network}
-Model of LSTM network is an extension of the simple recurrent network. It can store values in the hidden layer for a short or long period of time because it uses no activation function within its recurrent components. This makes it possible to backpropagate error gradient through long sequences of data without gradient vanishing or gradient exploding.
+Model of LSTM network is an extension of the simple recurrent network. It can store values in the hidden layer for a short or long period of time because it uses no activation function within its recurrent components. This makes it possible to backpropagate error gradient through long sequences of data without gradient vanishing or gradient exploding. This properties allow LSTM to catch long term patterns in an input sequences and make it a perfect choice for natural language modelling.
 
-At the time step $t$ LSTM consumes previous value of hidden state $h^{(t-1)}$, memory cell $c^{(t-1)}$ and input vector $x^{(t)}$. The new value of memory cell uses gates to forget part of previous value and remember new value. Input gate calculation:
+At the time step $t$ LSTM consumes a previous value of a hidden state $h^{(t-1)}$, a memory cell $c^{(t-1)}$ and an input vector $x^{(t)}$. The new value of memory cell uses gates to forget a part of the previous value and remember a new value. Input gate calculation:
 
 \begin{equation}
 i^{(t)}=\sigma(W_i\cdot[h^{(t-1)}, x^{(t)}]+b_i)
@@ -196,31 +196,42 @@ h^{(t)}=o^{(t)}\circ tanh(C^{(t)})
 \label{lstm:h}
 \end{equation} 
 
-LSTM step can be presented as function:
+LSTM step can be presented as a function:
 \begin{equation}
 h^{(t)}, c^{(t)} = f_{lstm}(x^{(t)}, h^{(t-1)}, c^{(t-1)})
 \end{equation}
 
-Value of memory cell often is not used in further calculations and thus can be omitted:
+The value of memory cell often is not used in a further calculations and thus can be omitted:
 \begin{equation}
 h^{(t)} = f_{lstm}(x^{(t)}, h^{(t-1)})
 \end{equation}
 
+For the task of natural language processing an important information about a current word can be stored not only at the previous words but also at the next words of the sentence. To catch this information a model of bidirectional LSTM (BiLSTM) was proposed  \parencite{schuster1997, graves2005}. It represents each word as a concatenation of a forward and a backward embedding:
+
+\begin{equation}
+\begin{gathered}
+h_{forward}^{(t)} = f_{lstm.forward}(x^{(t)}, h^{(t-1)}_{forward}) \\
+h_{backward}^{(t)} = f_{lstm.backward}(x^{(t)}, h^{(t+1)}_{backward}) \\
+
+h^{(t)} = [h_{forward}^{(t)}, h_{backward}^{(t)} ]
+\end{gathered}
+\end{equation}
+
 \section{Sequence-to-sequence machine translation} \label{seq2seq}
 % http://phontron.com/class/mtandseq2seq2017/mt-spring2017.chapter8.pdf
-The task of machine translation can be formalized as mapping of a sequence of words in a source language to a sequence of words in a target language \parencite{Neubig2017}. This task can be solved with an \emph{encoder-decoder} model, which consists of two RNNs. The first RNN consumes input sequence step by step and encodes it into so-called thought vector. After encoding, the second RNN uses thought vector as its initial hidden state and decodes output sentence word by word.  Each word from decoder output is used as input for the next decoding step until the model outputs the end-of-sentence token. 
+The task of the machine translation can be formalized as a mapping of a sequence of words in a source language to a sequence of words in a target language \parencite{Neubig2017}. This task can be solved with an \emph{encoder-decoder} model, which consists of two RNNs. The first RNN consumes input sequence step by step and encodes it into so-called thought vector. After encoding, the second RNN uses thought vector as its initial hidden state and decodes an output sentence word by word.  Each word from the decoder output is used as an input for the next decoding step until the model outputs the end-of-sentence token. 
 
-During training, Seq2Seq model learn its parameters by maximizing the log-likelihood $P(y|x)$ of a target sequence $y$ given input sequence $x$. The next input of decoder can be selected in two ways:
+During a training, Seq2Seq model learns its parameters maximizing the log-likelihood $P(y|x)$ of the target sequence $y$ given the input sequence $x$. The next input of decoder can be selected in two ways:
     \begin{itemize}
-    	\item \textbf{Without Teacher Forcing:} previous prediction used as the next input.
-    	\item \textbf{With Teacher Forcing:} target sequence values used as the next input.
+    	\item \textbf{Without Teacher Forcing:} the previous prediction used as the next input.
+    	\item \textbf{With Teacher Forcing:} A value from the target sequence used as the next input.
     \end{itemize}
 
 
 \subsection{Attention} \label{attention}
-Theoretically, a sufficiently large encoder-decoder model should be able to perform machine translation perfectly. However, to encode all words and dependencies between them in the arbitrary-length sentences the thought vector should have enormous length. It would require massive computational resources to train and use such architecture, and thus this approach is ineffective.
+Theoretically, a sufficiently large encoder-decoder model should be able to perform the machine translation perfectly. However, to encode all words and  their dependencies in the arbitrary-length sentences, the thought vector should have enormous length. Such model would require massive computational resources to train and to use,  thus this approach is ineffective.
 
-This problem can be solved with attention technique \parencite{Bahdanau2014}. Its basic idea is to replace single vector representation of input sentence with references to representations of different words in it. On the encoding step, each word representation $h_e^{(t)}$ is stored as a column of matrix $H_e$. During the decoding step, each decoder input extended with context vector $\phi^{(t-1)}$:
+This problem can be solved with attention technique \parencite{Bahdanau2014}. Its basic idea is to replace a single vector representation of the  input sentence with references to representations of different words in it. On the encoding step, each word representation $h_e^{(t)}$ is stored as a column of matrix $H_e$. During the decoding step, each decoder input is extended with context vector $\phi^{(t-1)}$:
 
 \begin{equation}
 h_d^{(t)} = lstm([w^{(t)}, \phi^{(t)}], h_d^{(t-1)})
@@ -235,13 +246,13 @@ h_d^{(t)} = lstm([w^{(t)}, \phi^{(t)}], h_d^{(t-1)})
 \label{fig:seq2seq}
 \end{figure}
 
-Context vector $\phi^{(t)}$ is calculated as a weighted sum of encoder representations:
+Context vector $\phi^{(t)}$ is calculated as a weighted sum of the encoder representations:
 \begin{equation}
 	\phi^{(t)} = H_e\cdot\alpha^{(t)}
 	\label{attn:phi}
 \end{equation}
 
-Weights for attention vector $\alpha^{(t-1)}$ can be calculated with arbitrary attention score function (for example, vector product) for each pair of decoder vector $h_d^{(t)}$ and encoder vector $h_e^{(i)}, \forall i \in 1..n$, where $n$ is a length of encoded sequence. In this work we used DNN with one hidden layer as suggested in work of \cite{Bahdanau2014}:
+Weights for the attention vector $\alpha^{(t-1)}$ can be calculated with an arbitrary attention score function (for example, vector product) for each pair of the decoder vector $h_d^{(t)}$ and the encoder vector $h_e^{(i)}, \forall i \in 1..n$, where $n$ is a length of the encoded sequence. In this work we used DNN with one hidden layer as suggested in the work of \cite{Bahdanau2014}:
 \begin{equation}
 \begin{gathered}
 \hat{\alpha}_i^{(t)} = W_{attn1} \cdot [h_e^{(i)}, h_d^{(t-1)}] \\
@@ -251,31 +262,31 @@ Weights for attention vector $\alpha^{(t-1)}$ can be calculated with arbitrary a
 \label{attn:alpha}
 \end{equation}
 
-This way each decoder step can use information from arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
+This way each decoder step can use information from an arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
 
 \subsection{Beam search} \label{beam}
 When the model learned the probability model on training examples, it can generate new translations. This can be done in several ways \parencite{Neubig2017}:
         \begin{itemize}
-    	\item \textbf{Random Sampling:} For each time step $t$ randomly select an output words $w^{(t)}$ for $y$ from the probability distribution $P(y|x)$.
+    	\item \textbf{Random Sampling:} For each time step $t$ randomly select output words $w^{(t)}$ for $y$ from the probability distribution $P(y|x)$.
     	\item \textbf{Gready Search:} Find the $y$ that maximizes $P(y|x)$, selecting each next word $w^{(i)}$ with maximum probability $\hat{w^{(t)}} = \underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$.
     	\item \textbf{Beam Search:} Find the $n$ outputs with the highest probabilities according to $P(y|x)$.
     \end{itemize}
 
-\emph{Beam search} is similar to greedy search, but instead of considering only the one best hypothesis $\underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$, its consider $b$ best hypotheses at each time step, where $b$ is the width of the beam. To find best hypotheses, beam search explores the generation graph in breadth-first manner. At each level of the search tree it calculates probability for each candidates from target space and then selects $b$ variants with the highest probability. This way it allows to generate sequences with higher cumulative probability, wchich could have been missed by the greedy search.
+\emph{Beam search} is similar to greedy search, but instead of considering only the one best hypothesis $\underset{w^{(t)}}{\operatorname{argmax}} P(w^{(i)}|x, w^{(<i)})$, it is considering $b$ best hypotheses at each time step, where $b$ is the width of the beam. To find the best hypotheses, beam search explores the generation graph in a breadth-first manner. At each level of the search tree it calculates a probability for each candidate from the target space and then selects $b$ variants with the highest probability. This way it allows to generate sequences with the higher cumulative probability, which could have been missed by the greedy search.
 
 \section{Recursive neural networks} \label{sec:rvnn}
 % reflects domain knowledge
-The architecture of recurrent neural network contains inductive bias about conditional probability of target variable with previous values in a sequence. Representation of natural language can also be modeled as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language meaning representation.
+The architecture of a recurrent neural network contains an inductive bias about a conditional probability of target variable with the previous values in a sequence. Natural language can be modeled this way, as a plain sequence of words. However, this approach ignores domain knowledge about the syntactic structure of a text. A syntactic tree contains important information about relations between individual terms and thus should not be omitted in the task of natural language modeling.
 
 \begin{figure}[h]
 \centering
-\includegraphics{Figures/rvnn}
+\includegraphics[width=5in]{Figures/rvnn.pdf}
 \decoRule
 \caption[RvNN flow]{Examle of recursive neural network flow.}
 \label{fig:rvnn}
 \end{figure}
 
-Topological structures with variable length could be modeled by neural networks recursively applying the same set of weights to each node. To model syntactic tree, each word is represented by corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of sentence \textquote{good dog like cats} could be modeled in the following way:
+Topological structures with a variable length could be modeled by neural networks recursively applying the same set of weights to each node. To model a syntactic tree, each word is represented by a corresponding embedding vector and then parent vectors are computed using a bottom-up approach with composition functions. For example, representation of the syntactic tree of the sentence \textquote{good dog like cats} could be modeled in the following way:
 \begin{equation}
 \begin{split}
 h_{NP} = f(W\cdot[w_{good}, w_{dog}] + b)\\
@@ -287,9 +298,9 @@ h_S = f(W\cdot[h_{NP}, h_{VP}] + b)
 where $f$ is any differentiable non-linearity like $tanh$ or $ReLU$. The example of semantic tree parsing with recursive network is presented in Fig \ref{fig:rvnn}.
 
 \section{Pointer networks} \label{pointer}
-Neural network operates with vector representations of words which selected from predefined vocabulary. This imposes the problem of unknown words which don't have vector representation. This is especially important for the translation task where both input and output sequences could contain rare, special words or names. However, names of people or locations should not be translated but copied to target sequence. \cite{Vinyals2015} proposed solution of this problem with \emph{pointer network}. For each decoding step it calculates the probability of next word to be copied from an input sequence. Calculation of this probability described below step-by-step.
+A neural network operates with vector representations of words that are selected from a predefined vocabulary. This imposes the problem of unknown words that don't have a vector representation. This is especially important for the translation task where both an input and an output sequences could contain rare, special words or names. However, names of people or locations should not be translated but copied to a target sequence. \cite{Vinyals2015} proposed a solution of this problem with \emph{pointer network}. For each decoding step it calculates the probability of the next word to be copied from an input sequence. Calculation of this probability is described below step-by-step.
 
-Let's denote $H_{encoder}$ as a matrix of encoder output vectors and $h_{decoder}^{(t)}$ - decoder output vector on decoding step $t$. First is calculated hidden state of pointer network:
+Let's denote $H_{encoder}$ as a matrix of encoder output vectors and $h_{decoder}^{(t)}$ - decoder output vector on decoding step $t$. First a hidden state of a pointer network is calculated:
 
 \begin{equation}
     \begin{gathered}
@@ -304,7 +315,7 @@ Let's denote $H_{encoder}$ as a matrix of encoder output vectors and $h_{decoder
     \label{eq:pointer}
 \end{equation}
 
-Then each row from matrix $H_{pointer}$ is translated to one value and probability calculated as result of $softmax$:
+Then each row from the matrix $H_{pointer}$ is translated to one value and probability calculated as result of $softmax$:
 
 \begin{equation}
     \begin{gathered}
@@ -316,8 +327,7 @@ Then each row from matrix $H_{pointer}$ is translated to one value and probabili
     \end{gathered}
 \end{equation}
 
-Vector $P$ contains probability for each input sequence token to be copied into output sequence. In following explanations, pointer network function denoted $f_{pointer}$:
+Vector $P$ contains a probability for each input sequence token to be copied into the output sequence. In the following explanations, a pointer network function is denoted $f_{pointer}$:
 \begin{equation}
     P = f_{pointer}(H_e, h_d^{(t)})
 \end{equation}
-

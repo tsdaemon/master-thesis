@@ -176,7 +176,7 @@ headsepline, % Uncomment to get a line under the header
 
 \begin{abstract}
 \addchaptertocentry{\abstractname} 
-Software development requires vast knowledge of different programming tools which cannot be kept in human memory. Therefore software developers often formulate their task in human language to query online knowledge bases like StackOverflow to get short snippets of code. In this work, we explored the way of code generation from natural language description and prepared web API for Python which translates NL descriptions to short snippets of code. Our model resembles recursive encoder and uses syntactic trees instead of plain sequence on input. Results have not outperformed current state-of-the-art performance. However, presented Tree2Tree model has potential in other applications and this work makes a solid background for a further research.
+Software development requires vast knowledge of different programming tools which cannot be kept in human memory. Therefore software developers often formulate their task in human language to query online knowledge bases like StackOverflow to get short snippets of code. In this work, we explored the way of code generation from natural language description and prepared web API for Python which translates NL descriptions to short snippets of code. Our model implements sequence-to-sequence model with recursive encoder and uses syntactic trees instead of plain sequence on input. Results have not outperformed current state-of-the-art performance. However, presented Tree2Tree model has potential in other applications and this work makes a solid base for a further research.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ I would like to thank Vsevolod Dyomkin and Rostyslav Hryniv who supervised and d
 
 This work would not be possible without computational resources for neural network training provided by ArviLab. Thanks to CoreNLP and EasyCCG developers, who provided great tools for natural language parsing. And thanks to PyTorch team for the easy and handy DNN framework.
 
-Last, but not least I am grateful to Ukrainian Catholic University and Oleksii Molchanovskyi personally for the first in Ukraine master program in data science.
+Last, but not least I am grateful to Ukrainian Catholic University and Oleksii Molchanovskyi personally for the first in Ukraine master program in data science. I also want to thank Grammarly, Inc for covering my tuition fees.
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
@@ -209,7 +209,10 @@ Last, but not least I am grateful to Ukrainian Catholic University and Oleksii M
 \begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
 
 \textbf{AST} & \textbf{A}bstract \textbf{S}yntax \textbf{T}ree\\
+\textbf{BiLSTM} & \textbf{Bi}directional \textbf{L}ong \textbf{S}hort-\textbf{T}erm \textbf{M}emory\\
+\textbf{BLEU} & \textbf{B}ilingual \textbf{E}valuation \textbf{U}nderstudy\\
 \textbf{CCG} & \textbf{C}ombinatory \textbf{C}ategorial \textbf{G}rammar\\
+\textbf{CFG} & \textbf{C}ontext \textbf{F}ree \textbf{G}rammar\\
 \textbf{DNN} & \textbf{D}eep \textbf{N}eural \textbf{N}etwork\\
 \textbf{LSTM} & \textbf{L}ong \textbf{S}hort-\textbf{T}erm \textbf{M}emory\\
 \textbf{MT} & \textbf{M}achine \textbf{T}ranslation\\
@@ -218,7 +221,7 @@ Last, but not least I am grateful to Ukrainian Catholic University and Oleksii M
 \textbf{OOV} & \textbf{O}ut \textbf{O}f \textbf{V}ocabulary\\
 \textbf{PBG}  & \textbf{P}hrase \textbf{B}ased \textbf{G}rammar \\
 \textbf{PCFG}  & \textbf{P}robabilistic \textbf{C}ontext-\textbf{F}ree \textbf{G}rammar\\
-\textbf{ReLU}  & \textbf{R}ectified \textbf{L}inear \textbf{U}nit\\
+\textbf{ReLU}  & \textbf{Re}ctified \textbf{L}inear \textbf{U}nit\\
 \textbf{RNN}  & \textbf{R}eccurent \textbf{N}eural \textbf{N}etwork\\
 \textbf{RvNN} & \textbf{R}ecursive \textbf{N}eural \textbf{N}etwork\\
 \textbf{Seq2Seq} & \textbf{S}equence-to-\textbf{S}equence\\
@@ -240,7 +243,7 @@ $\circ$ & entrywise multiplication \\
 $[x1, x2]$ & concatenation of vectors $x1$ and $x2$ \\
 \addlinespace 
 $p(y|x)$ & probability of $y$ given $x$ \\
-$P$ & vector of probabilities \\
+$P$ & vector of probability distribution \\
 $\tau$ & abstract syntax tree \\
 $\eta$ & node in natural language syntax tree \\
 \addlinespace
@@ -269,9 +272,9 @@ $W$ & linear transformation weights \\
 $b$ & linear transformation bias \\
 \addlinespace
 $f_{pointer}$ & pointer network function \\
-$f_{lstm}$ & Long Short-Term Memory single step \\
+$f_{lstm}$ & Long Short-Term Memory single step function \\
 $softmax$ & normalized exponential function \\
-$tanh$ & hyperbolic tangent \\
+$tanh$ & hyperbolic tangent function \\
 \addlinespace 
 
 

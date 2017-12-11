@@ -3,7 +3,9 @@
 \section{Datasets}
 \textbf{HearthStone (HS)}  dataset \parencite{Ling2016} is a collection of Python classes which implements cards from the card game HearthStone. Each card has a set of attributes which is concatenated to produce the input sequence. The dataset contains 665 Python classes with descriptions.
 
-\textbf{Django} dataset \parencite{Oda2015} contains a corpus of lines of Python code with manually annotated pseudocode from the Django web framework. Corpus contains 18,805 pairs of Python statements and corresponding English pseudo-codes. 
+\textbf{Django} dataset \parencite{Oda2015} contains a corpus of lines of Python code with manually annotated pseudo-code from the Django web framework. Corpus contains 18,805 pairs of Python statements and corresponding English pseudo-codes. 
+
+Statistics of datasets can be found in Tab. \ref{tab:stat}.
 
 \begin{table}
 \centering
@@ -36,14 +38,15 @@ Avg. \# of actions per example$^\dagger$ & 173.4 & 20.3 \\
 Avg. \# of actions per example$^\dagger$ & 141.7 & 16.4 \\ 
 \hline
 \end{tabular}
-\caption[Statistics of datasets]{Statistics of datasets and associated grammars ($^\dagger$Previously reported by \cite{Yin2017}. $^*$Number of dependency tree nodes is equal to a number of tokens in descrition.)}
+\caption[Statistics of datasets]{Statistics of datasets and associated grammars ($^\dagger$Previously reported by \cite{Yin2017}. $^*$Number of dependency tree nodes is equal to a number of tokens in the description.)}
+\label{tab:stat}
 \end{table}
 
 % \cite{Barone2017} (BS) created the dataset of Python code with parallel descriptions from GitHub. It contains 150,370 triples of function declarations, docstrings and bodies. This dataset presents the most challenging task because it contains highly heterogeneous and noisy data. Django pseudo-code already has a good alignment with target code and HeartStone code examples are mostly homogeneous and target specific domain.
 
 \subsection{Preprocessing} \label{preprocessing}
 
-All input descriptions was tokenized using Stanford CoreNLP\footnote{\href{https://stanfordnlp.github.io/CoreNLP}{https://stanfordnlp.github.io/CoreNLP}} Java package. Quoted text, which might be refered as values for string constants, replaced with special markers (Tab. \ref{table:str_markers}). Nested object references, like \code{re.findall} was split by the period so pointer network can copy each part separately (Tab. \ref{table:function_calls}). For \textbf{HS} we also constructed synthetic description, using structured part of target class descriptions (Tab. \ref{table:hs_input}). Then all descriptions was parsed to trees with three different approaches, described below.
+All input descriptions was tokenized using Stanford CoreNLP\footnote{\href{https://stanfordnlp.github.io/CoreNLP}{https://stanfordnlp.github.io/CoreNLP}} Java package. Quoted text, which might be referred as values for string constants, replaced with special markers (Tab. \ref{table:str_markers}). Nested object references in queries, like \code{re.findall} was split by the period so pointer network can copy each part separately (Tab. \ref{table:function_calls}). For \textbf{HS} we also constructed synthetic description, using structured part of target class descriptions (Tab. \ref{table:hs_input}). Then all descriptions were parsed to trees with three different approaches, described below.
 
 \begin{table}
 \begin{tabularx}{\textwidth}{ l X }
@@ -57,7 +60,7 @@ All input descriptions was tokenized using Stanford CoreNLP\footnote{\href{https
 \textbf{Target code preprocessed:} & while '\_STR\_0\_' in value and '\_STR\_1\_' in value: \\
 \hline
 \end{tabularx}
-\caption[Quoted items preprocessing]{Quoted items preprocessing item \#2 from the developer split of \textbf{Django}.}
+\caption[Quoted items preprocessing]{Quoted items preprocessing for item \#2 from the development split of \textbf{Django}.}
 \label{table:str_markers}
 \end{table}
 
@@ -85,32 +88,81 @@ All input descriptions was tokenized using Stanford CoreNLP\footnote{\href{https
 \label{table:hs_input}
 \end{table}
 
-To create CFG sentence representation we used \code{LexicalizedParser} \parencite{klein2003} from the CoreNLP. Dependency parsing was done by \code{DependencyParser} \parencite{chen2014} from the CoreNLP. For CCG parsing we used package EasyCCG\footnote{\href{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}} \parencite{lewis2014}.\footnote{We were not able to include figures with examples parse trees in the thesis due to their large size, but you can find them at our \href{https://github.com/tsdaemon/treelstm-code-generation/tree/master/pictures}{GitHub repo}}
+To create CFG sentence representation we used \code{LexicalizedParser} \parencite{klein2003} from the CoreNLP. Dependency parsing was done by \code{DependencyParser} \parencite{chen2014} from the CoreNLP. For CCG parsing we used package EasyCCG\footnote{\href{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}{http://homepages.inf.ed.ac.uk/s1049478/easyccg.html}} \parencite{lewis2014}.\footnote{We were not able to include figures with parsed trees examples in this thesis due to their large size, but you can find them at our \href{https://github.com/tsdaemon/treelstm-code-generation/tree/master/pictures}{GitHub repo}}
 
 \section{Implementation details}
 
-\textbf{Dynamic computational graph.} Model of \cite{Yin2017} was build on framework Theano\footnote{\href{http://deeplearning.net/software/theano/}{http://deeplearning.net/software/theano/}}. But Theano is not able to build dynamic computational graph to encode syntactic trees. Therefore, we implemented our model on PyTorch\footnote{\href{http://pytorch.org/}{http://pytorch.org/}}.
+\textbf{Dynamic computational graph.} Model of \cite{Yin2017} was build on framework Theano\footnote{\href{http://deeplearning.net/software/theano/}{http://deeplearning.net/software/theano/}}. But Theano is not able to build a dynamic computational graph to encode syntactic trees. Therefore, we have implemented our model on PyTorch\footnote{\href{http://pytorch.org/}{http://pytorch.org/}}.
 
-\textbf{Model parameters.} The size of all embeddings is 256, except for word embeddings, which is 300. For word embeddings we used preptrained Common Crawl GloVe vectors \parencite{pennington2014}. We have not freeze weights of word embeddings, so  pretrained values can be additionaly adjusted during training. The dimensions of encoder and decoder hidden states and memory cells are 256. Hidden states of attention and pointer networks are of size 50. Also, we used last state of encoder as initial state of decoder (thought vector). For decoding we used beam size 10.
+
+\textbf{Mini-batch training.} The nature of the recursive tree encoding does not allow to process data in batches, as each query defines unique computational graph. But other parts of the model was able to perform batch operations on data. Therefore we used a wrapper encoder module, which splitted input batch on single queries, processed them with Tree-LSTM module sequentially and combined back into batch. We used batches of size 10 for \textbf{HS} and 50 for \textbf{Django}.
+
+\textbf{Model parameters.} The sizes of nodes, rules and terminal embeddings were 256. Except for the word embeddings, for which it was 300. We used pre-trained Common Crawl GloVe vectors \parencite{pennington2014} for the word embeddings weights. We were not freezing this weights, so the pre-trained values could be additionally adjusted during training. The dimensions of the encoder and decoder hidden states and memory cells were 256. Hidden states of attention and pointer networks were of size 50. Also, we used the last state of the encoder as the initial state of the decoder (thought vector). For decoding, we used the beam of size 10.
 
 % https://r2rt.com/non-zero-initial-states-for-recurrent-neural-networks.html
-\textbf{Regularization.} Since our datasets are relatively small for  a such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similary to approach described in work of \cite{zimmermann2012} we added Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. These methods added statistically significant improvement of both training speed and validation scores.
+\textbf{Regularization.} Since our datasets were relatively small for such complex neural model, we added strong regularization using Variational Dropout suggested in work of \cite{Gal2016}. Similarly to approach described in the work of \cite{zimmermann2012} we were adding Gaussian noise with mean 0.0 and STD 0.1 to initial states $h^{(0)}$ and $c^{(0)}$ of encoder. These methods introduced significant improvement in both training speed and evaluation scores.
 
 \section{Experimental setup} \label{exp_setup}
 
-\textbf{Evaluation metrics.} For this experiment we measured \textbf{accuracy} as a fraction of output code which fully match target examples. Additionally, to measure quality of examples without full match we used average token level \textbf{BLEU-4}, as suggested by \cite{Ling2016} and \cite{Yin2017}. However, BLEU and accuracy do not measure actual correctness of a generated code. Therefore we defined an \textbf{errors} metric as a fraction of output trees which we was not able to convert into code.
+\textbf{Evaluation metrics.} For this experiment, we measured \textbf{accuracy} as a fraction of output code which fully matches target examples. Additionally, to measure the quality of examples without full match we used average token level \textbf{BLEU-4}, as suggested by \cite{Ling2016} and \cite{Yin2017}. However, BLEU and accuracy do not measure the actual correctness of a generated code. Therefore we defined  \textbf{errors} metric as a fraction of output trees which we were not able to convert into code.
 
-\textbf{Baseline.} Along with Tree-LSTM encoder we prepared model previously decribed in work of \cite{Yin2017}, with vanilla bidirectional LSTM encoder. This was done to have clear baseline for semantic encoding method. 
+\textbf{Baseline.} Along with Tree-LSTM encoder, we build bidirectional LSTM encoder, previously described in the work of \cite{Yin2017}. This was done to have a clear baseline for our tree encoding method. 
 
 \section{Results}
-Evaluation results are listed in Tab. \ref{table:evaluation}. The best model was selected using results of evaluation on development set and then evaluated on the separate test set. We compared with two approaches: (1) Latent Predictor Network (LPN) \parencite{Ling2016} and (2) Syntactic Neural Model \parencite{Yin2017}. 
+Evaluation results are listed in Tab. \ref{table:evaluation}. We compared our results with two approaches: (1) Latent Predictor Network (LPN) of \cite{Ling2016} and (2) Syntactic Neural Model of \cite{Yin2017}. 
 
-\textbf{Results analysis.} As presented in Tab. \ref{table:evaluation}, performance of models with Tree-LSTM encoder have results comparable with LPN. Yet no model was able to improve current state-of-the-art results of Syntactic Neural Model. Also, tree encoders have shown much higher rate of errors than BiLSTM encoder.
+\textbf{Analysis.} As presented in Tab. \ref{table:evaluation}, the performance of models with Tree-LSTM encoder have results comparable with LPN. Yet no model was able to improve current state-of-the-art results of Syntactic Neural Model. Also, tree encoders have shown a much higher rate of errors than BiLSTM encoder.
 
-Although all type of query trees have almost equal performance, dependency trees encoding have shown better results for HS. Dependency trees do not contain phrasal node and therefore shorter. This can be a proper justification for the difference for the dataset with long and homogeneous descriptions.
+Results of the model with BiLSTM encoder match the previously reported results of \cite{Yin2017}. This makes us certain that our implementation is valid and difference in performance with previous results caused actually be the tree encoders.
 
-\begin{table}
-\begin{tabular}[h]{ l c c c c c c }
+Dependency trees encoding has shown better results for \textbf{HS}. Dependency trees do not contain phrasal nodes and therefore shorter. This can be a proper justification for the difference in results for \textbf{HS} which contains long and similar descriptions. However, results for the \textbf{Django} dataset  have a contrary bias. The performance of dependency trees is much lower than the performance of CFG and CCG trees. It can be explained by the fact, that \textbf{Django} has shorter and more divergent queries and due to this properties its dependency trees has lower generalization ability. CCG and CFG trees have less divergent structures where each node have no more than two children. Therefore informational flow in such trees might have higher approximation abilities. Yet this is only our assumption and it requires additional research.
+
+\section{Case studies}
+
+\begin{table}[h]
+\begin{tabular}{ l m{5cm} }
+\hline
+\textbf{Query:} &  \\
+\hline 
+\hline 
+\textbf{Sequential encoder results:} & 
+\begin{verbatim} 
+tralivali 
+ululu
+\end{verbatim}
+\\
+\hline
+\textbf{Tree encoding result:} & \\
+\hline
+\ \textbf{dependency tree} & 
+% \begin{verbatim} 
+% tralivali 
+% ululu
+% \end{verbatim} 
+\\
+\hline
+\ \textbf{constituency tree} & 
+% \begin{verbatim} 
+% tralivali 
+% ululu
+% \end{verbatim} 
+\\
+\hline
+\ \textbf{CCG tree} & 
+% \begin{verbatim} 
+% tralivali 
+% ululu
+% \end{verbatim} 
+\\
+\hline
+\end{tabular}
+\caption[Translation example for HS]{Translation example for the item \#4 from the test split of \textbf{HS}.}
+\label{table:hs_case}
+\end{table}
+
+
+\begin{table}[p]
+\begin{tabular}{ l c c c c c c }
 
 \hline
 & \multicolumn{3}{c}{\textbf{HS}} & \multicolumn{3}{c}{\textbf{Django}}\\
@@ -127,18 +179,18 @@ Seq2Tree-UNK$^\ddagger$ & 13.6 & 62.8 & - & 39.4 & 58.2 & - \\
 LPN$^\dagger$ & 4.5 & 65.6 & - & 62.3 & 77.6 & - \\
 Syntactic Neural Model$^\ddagger$ & \textbf{16.7} & \textbf{75.8} & - & \textbf{71.6} & \textbf{84.5} & - \\
 \hline
-\multicolumn{7}{l}{\textbf{w/ unary closures:}}\\
-Bi-directional LSTM encoder & 9.1 & 71.6 & 0.6 &  \\
+\multicolumn{7}{l}{\textbf{w/ unary closures:}} \\
+Bi-directional LSTM encoder & 9.1 & 71.6 & 0.6 & 68 & 82.5 & 0.8  \\
 \multicolumn{7}{l}{Tree-LSTM encoder} \\
-\ with dependency trees & 4.5 & 66.7 & 3.0 &  \\
-\ with constituency trees & 4.5 & 63.9 & 13.2 &  \\
-\ with CCG trees & 3.0 & 66.1 & 5.1 &  \\
+\ with dependency trees & 4.5 & 66.7 & 3.0 & 32.9 & 55.5 & 1.1 \\
+\ with constituency trees & 4.5 & 63.9 & 13.2 & 42.0 & 61.8 & 0.9 \\
+\ with CCG trees & 3.0 & 66.1 & 5.1 & 48.7 & 68.7 & 1.5 \\
 \multicolumn{7}{l}{\textbf{w/o unary closures:}}\\
-Bi-directional LSTM encoder & 16.2 & 69.2 & 0.3 &  \\
+Bi-directional LSTM encoder & 16.2 & 74.2 & 0.3 & 71.0 & 84.5 & 0.4  \\
 \multicolumn{7}{l}{Tree-LSTM encoder} \\
-\ with dependency trees & 6 & 71.5 & 4.0 &  \\
-\ with constituency trees & 4.5 & 64.9 & 13.2 &  \\
-\ with CCG trees & 3.0 & 65.3 & 11.0 &  \\
+\ with dependency trees & 6 & 71.5 & 4.0 & 32.0 & 55.0 & 0.9 \\
+\ with constituency trees & 4.5 & 64.9 & 13.2 & 42.3 & 61.0 & 1.1 \\
+\ with CCG trees & 3.0 & 65.3 & 11.0 & 49.4 & 69.6 & 1.8 \\
 \hline
 \end{tabular}
 \caption[Final results]{Evaluation results for both datasets. $^\dagger$Results previously reported by \cite{Ling2016}. $^\ddagger$Results previously reported by \cite{Yin2017}.}
