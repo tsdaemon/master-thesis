@@ -14,9 +14,9 @@ The \emph{abstract syntax tree} is a tree representation of an abstract structur
 
 \footnotetext{Picture is created in Python library \href{https://github.com/hchasestevens/show_ast}{showast}.}
 
-The Python \emph{abstract grammar} contains a set of production rules, composed of head node and multiple child nodes. For example, in Fig \ref{fig:ast} the first rule is used to generate the assignment of statement result to variable. It consists of the head node of type \code{Assign} and two child nodes of types \code{Name} and \code{Call}, respectively. Non-terminal nodes (the blue ones) defines the general structure of the target code, while terminal nodes (the green ones) refer to symbol tokens, like variables, constants or operations. Full Python 3.6 abstract grammar can be found in Appendix \ref{AppendixA}. 
+The Python \emph{abstract grammar} contains a set of production rules, composed of head node and multiple child nodes. For example, in \cref{fig:ast} the first rule is used to generate the assignment of statement result to variable. It consists of the head node of type \code{Assign} and two child nodes of types \code{Name} and \code{Call}, respectively. Non-terminal nodes (the blue ones) defines the  structure of the target code, while terminal nodes (the green ones) refer to symbol tokens, like variables, constants or operations. Full Python 3.6 abstract grammar can be found in  \cref{AppendixA}. 
 
-\section{Semantic parsing}
+\section{syntactic parsing}
 \subsection{Constituency parsing}
 Theory of sentence analysis is derived from the idea that the words of a sentence seem to combine into patterns and structures. Each word is classified as a different in terms of its function in a sentence. According to this function, to each word there can be assigned its lexical category or part of speech, like a noun (\code{N}), adjective (\code{A}), or verb (\code{V}). 
 
@@ -48,9 +48,9 @@ N => cats
 V => like
 A => good
 \end{verbatim}
-Graphic representation of syntactic tree  of this sentence can be seen in Fig \ref{fig:syntax_tree}.
+Graphic representation of syntactic tree  of this sentence can be seen in \cref{fig:syntax_tree}.
 
-Phrase-based grammar might also be refered as \emph{context-free grammar}, beause it provides a simple and mathematically precise mechanism for describing the methods by which phrases in some natural language are built from smaller blocks. Important features of natural language syntax such as agreement and reference are not part of the context-free grammar, but the basic recursive structure of sentences, the way in which clauses nest inside other clauses, and the way in which lists of adjectives and adverbs are swallowed by nouns and verbs, is described exactly.
+Phrase-based grammar might also be referred as a \emph{context-free grammar}, because it provides mechanism for combining a phrases from their constituents without usage of sentence context.
 
 \begin{figure}
 \centering
@@ -130,7 +130,7 @@ $\lambda y.like(y, CATS)(good(DOGS))=like(good(DOGS), CATS)$
 
 Another approach to represent sentence semantical structure is \emph{dependency parsing}. \emph{Dependency grammar} is different from constituency grammars like CFG or CCG, which build sentence tree by applying rewrite rules to constitute high level phrases from low level syntactic categories and lexems. Dependency graph also defines sentence structure as a graph, but without phrasal nodes like \code{NP} or \code{VP}. Instead each node represent one word which points to it dependent. Since such representation do not rely on established phrase word order it is well suited for the analysis of languages with free word order, such as Ukrainian.
 
-In Fig \ref{fig:dependency_graph} sentence \textquote{nice dogs like cats} is parsed to dependency graph. It consists of the following dependencies: 
+In \cref{fig:dependency_graph} sentence \textquote{nice dogs like cats} is parsed to dependency graph. It consists of the following dependencies: 
 
 \begin{verbatim}
 amod = adjectival modifier
@@ -150,7 +150,7 @@ case = case marker
 
 The task of language modeling requires the transformation of words and documents into vector representation. Simple tasks like text classification could be done using naive representations like a bag of words or one hot encoding. However, these approaches would require excessive memory usage to handle large vocabulary and usually do not infer existing semantical connections between words in a language. 
 
-Methods of \emph{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing to the same point as vector ‘aunt’ (see Fig \ref{fig:word_embeddings} for example).
+Methods of \emph{word embeddings} solve both problems, providing dense vectors of real numbers, which represent word positions in $n$-dimensional space. This space represents contextual similarity of the words, thus word embeddings support semantic relations as vector operations. For example, adding vector ‘woman’ to vector ‘uncle’ and subtracting vector ‘man’ will result in vector approximately pointing to the same point as vector ‘aunt’ (see \cref{fig:word_embeddings} for example).
 
 \section{Long-short term memory network}
 Model of LSTM network is an extension of the simple recurrent network. It can store values in the hidden layer for a short or long period of time because it uses no activation function within its recurrent components. This makes it possible to backpropagate error gradient through long sequences of data without gradient vanishing or gradient exploding. This properties allow LSTM to catch long term patterns in an input sequences and make it a perfect choice for natural language modelling.
@@ -262,7 +262,7 @@ Weights for the attention vector $\alpha^{(t-1)}$ can be calculated with an arbi
 \label{attn:alpha}
 \end{equation}
 
-This way each decoder step can use information from an arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in Fig \ref{fig:seq2seq}.
+This way each decoder step can use information from an arbitrary part of encoded sequence. Input sentence representation should not be limited to fixed length thought vector, and thus it can model natural language with adequate model size. An architecture of sequence-to-sequence model with attention can be seen in \cref{fig:seq2seq}.
 
 \subsection{Beam search} \label{beam}
 When the model learned the probability model on training examples, it can generate new translations. This can be done in several ways \parencite{Neubig2017}:
@@ -295,7 +295,7 @@ h_S = f(W\cdot[h_{NP}, h_{VP}] + b)
 \label{rvnn:example}
 \end{split}
 \end{equation}
-where $f$ is any differentiable non-linearity like $tanh$ or $ReLU$. The example of semantic tree parsing with recursive network is presented in Fig \ref{fig:rvnn}.
+where $f$ is any differentiable non-linearity like $tanh$ or $ReLU$. The example of semantic tree parsing with recursive network is presented in \cref{fig:rvnn}.
 
 \section{Pointer networks} \label{pointer}
 A neural network operates with vector representations of words that are selected from a predefined vocabulary. This imposes the problem of unknown words that don't have a vector representation. This is especially important for the translation task where both an input and an output sequences could contain rare, special words or names. However, names of people or locations should not be translated but copied to a target sequence. \cite{Vinyals2015} proposed a solution of this problem with \emph{pointer network}. For each decoding step it calculates the probability of the next word to be copied from an input sequence. Calculation of this probability is described below step-by-step.

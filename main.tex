@@ -44,6 +44,8 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{verbatimbox}
+\usepackage{cleveref}
+
 \def\verbarg{{\scriptsize\makebox[2ex]{\arabic{VerbboxLineNo}}}\hspace{2ex}}
 \usepackage{mathpazo} % Use the Palatino font by default
 
@@ -58,7 +60,7 @@ headsepline, % Uncomment to get a line under the header
 
 \newcounter{codelist}[section]
 \newenvironment{codelist}[1]
-    {\refstepcounter{codelist}\par\medskip\noindent {\bfseries Ls. \thecodelist.   \hspace{0.1cm}#1~}}
+    {\refstepcounter{codelist}\par\medskip\noindent {\bfseries Listing \thecodelist.   \hspace{0.1cm}#1~}}
     {\medskip}
 %----------------------------------------------------------------------------------------
 %	MARGIN SETTINGS
